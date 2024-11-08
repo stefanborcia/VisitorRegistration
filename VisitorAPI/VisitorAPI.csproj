@@ -19,7 +19,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\VisitorDataAccess\VisitorDataAccess.csproj" />
+	  <ProjectReference Include="..\VisitorBusinessLogic\VisitorBusinessLogic.csproj" />
 	</ItemGroup>
 
 </Project>

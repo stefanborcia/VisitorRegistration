@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Swashbuckle.AspNetCore;
+using VisitorBusinessLogic.Services;
 using VisitorDataAccess;
+using VisitorDataAccess.Repositories.Interfaces;
+using VisitorDataAccess.Repositories;
 namespace VisitorAPI
 {
     public class Program
@@ -17,6 +17,17 @@ namespace VisitorAPI
             //Register VisitorDbContext
             builder.Services.AddDbContext<VisitorDbContext>(options =>
                  options.UseSqlServer(builder.Configuration.GetConnectionString("VisitorManagementDb")));
+
+            // Register repositories
+            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+            builder.Services.AddScoped<IVisitorRepository, VisitorRepository>();
+
+            // Register services
+            builder.Services.AddScoped<IVisitorService, VisitorService>();  
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+            // Add controllers
+            builder.Services.AddControllers();
 
             // Add Swagger services
             builder.Services.AddEndpointsApiExplorer();
@@ -35,7 +46,7 @@ namespace VisitorAPI
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
+            app.MapControllers();
             app.Run();
         }
     }

@@ -11,7 +11,7 @@ namespace VisitorDataAccess.Entities
         public long Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public Company? Company { get; set; } //string
+        public string? Company { get; set; } 
         public List<Visit> Visits { get; set; } = new List<Visit>();
     }
 }

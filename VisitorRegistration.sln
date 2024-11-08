@@ -5,13 +5,15 @@ VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{DD0A1C3B-ECC4-421E-92CA-C4A4F1445470}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisitorAPI", "VisitorAPI\VisitorAPI.csproj", "{4AAC749E-141F-4767-AA00-221626104E66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisitorAPI", "VisitorAPI\VisitorAPI.csproj", "{4AAC749E-141F-4767-AA00-221626104E66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisitorBlazor", "VisitorBlazor\VisitorBlazor.csproj", "{72C6ADEF-31B9-4155-8098-B55B05096049}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisitorBlazor", "VisitorBlazor\VisitorBlazor.csproj", "{72C6ADEF-31B9-4155-8098-B55B05096049}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisitorBusinessLogic", "VisitorBusinessLogic\VisitorBusinessLogic.csproj", "{7334E7D9-4A19-4296-A5D3-0C09CF6C63C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisitorBusinessLogic", "VisitorBusinessLogic\VisitorBusinessLogic.csproj", "{7334E7D9-4A19-4296-A5D3-0C09CF6C63C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisitorDataAccess", "VisitorDataAccess\VisitorDataAccess.csproj", "{786B3EB8-29A3-4696-B5D4-4DDD69AF7638}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisitorDataAccess", "VisitorDataAccess\VisitorDataAccess.csproj", "{786B3EB8-29A3-4696-B5D4-4DDD69AF7638}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisitorDTOs", "VisitorDTOs\VisitorDTOs.csproj", "{4F6F8318-986B-4F4B-B3FE-3F1CAA553826}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +37,10 @@ Global
 		{786B3EB8-29A3-4696-B5D4-4DDD69AF7638}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{786B3EB8-29A3-4696-B5D4-4DDD69AF7638}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{786B3EB8-29A3-4696-B5D4-4DDD69AF7638}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F6F8318-986B-4F4B-B3FE-3F1CAA553826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F6F8318-986B-4F4B-B3FE-3F1CAA553826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F6F8318-986B-4F4B-B3FE-3F1CAA553826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F6F8318-986B-4F4B-B3FE-3F1CAA553826}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
