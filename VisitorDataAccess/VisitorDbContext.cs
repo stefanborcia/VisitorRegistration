@@ -12,6 +12,24 @@ namespace VisitorDataAccess
         public DbSet<Visit> Visits { get; set; }
         public DbSet<VisitorLog> VisitorLogs { get; set; }
         public DbSet<Admin> Admins { get; set; }
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Deleted);
+
+            foreach (var entry in entries)
+            {
+                entry.State = EntityState.Modified;
+                var entity = entry.Entity;
+                var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
+                if (isDeletedProperty != null)
+                {
+                    isDeletedProperty.SetValue(entity, true);
+                }
+            }
+
+            return base.SaveChanges();
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Visit>()
@@ -22,29 +40,32 @@ namespace VisitorDataAccess
             modelBuilder.Entity<Visit>()
                 .HasOne(v => v.VisitingCompany)
                 .WithMany()
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Configure soft delete for entities
+            modelBuilder.Entity<Company>().HasQueryFilter(c => !c.IsDeleted);
+            modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Visitor>().HasQueryFilter(v => !v.IsDeleted);
+            modelBuilder.Entity<Visit>().HasQueryFilter(v => v.EndTime == null || v.EndTime > DateTime.Now);
+            modelBuilder.Entity<VisitorLog>().HasQueryFilter(vl => vl.TimeSpent > TimeSpan.Zero);
+
+            // Define keys
+            modelBuilder.Entity<Company>().HasKey(c => c.Id);
+            modelBuilder.Entity<Employee>().HasKey(e => e.Id);
+            modelBuilder.Entity<Visitor>().HasKey(v => v.Id);
+            modelBuilder.Entity<Visit>().HasKey(v => v.Id);
+            modelBuilder.Entity<VisitorLog>().HasKey(vl => vl.Id);
+            modelBuilder.Entity<Admin>().HasKey(a => a.Id);
+
+            // Define string lengths and optional EndTime
+            modelBuilder.Entity<Company>().Property(c => c.Name).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Employee>().Property(e => e.Name).HasMaxLength(20).IsRequired();
+            modelBuilder.Entity<Visit>().Property(v => v.EndTime).IsRequired(false);
+
+            //Apart class to seed data
+            DbInitializer.SeedData(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
-
-            // Seed companies 
-            modelBuilder.Entity<Company>().HasData(
-                new Company { Id = 1, Name = "On Core" },
-                new Company { Id = 2, Name = "Integration Team" }
-            );
-
-            // Seed employees 
-            modelBuilder.Entity<Employee>().HasData(
-                new Employee { Id = 1, Name = "Angelo Dejaeghere", CompanyId = 1 },  
-                new Employee { Id = 2, Name = "Niels Stubbe", CompanyId = 1 },        
-                new Employee { Id = 3, Name = "Mathias Schaemelhout", CompanyId = 1 }         
-            );
-
-            // Seed employees 
-            modelBuilder.Entity<Employee>().HasData(
-                new Employee { Id = 4, Name = "Nathan Moerman", CompanyId = 2 },     
-                new Employee { Id = 5, Name = "Robert Maes", CompanyId = 2 },     
-                new Employee { Id = 6, Name = "Nils Van Butsel", CompanyId = 2 }     
-            );
         }
     }
 }

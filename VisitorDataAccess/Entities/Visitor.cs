@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace VisitorDataAccess.Entities
 {
-    public class Visitor
+    public class Visitor : SoftDelete
     {
         public long Id { get; set; }
         public string Name { get; set; }

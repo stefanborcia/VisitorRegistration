@@ -34,14 +34,23 @@ namespace VisitorBusinessLogic.Services
 
             var visit = new Visit { Visitor = visitor, VisitingCompany = company, AppointmentWith = employee, StartTime = DateTime.Now };
             await _visitorRepository.CreateVisitAsync(visit);
+
         }
 
         private void ValidateVisitor(SignInVisitorDTO visitorDto)
         {
-            if (!VisitorValidator.ValidateName(visitorDto.Name).IsSuccess) throw new Exception("Invalid name.");
-            if (!VisitorValidator.ValidateEmail(visitorDto.Email).IsSuccess) throw new Exception("Invalid email.");
-            if (!VisitorValidator.ValidateVisitingCompanyId(visitorDto.VisitingCompanyId).IsSuccess) throw new Exception("Invalid company ID.");
-            if (!VisitorValidator.ValidateAppointmentWithId(visitorDto.AppointmentWithId).IsSuccess) throw new Exception("Invalid appointment ID.");
+            var nameValidationResult = VisitorValidator.ValidateName(visitorDto.Name);
+            if (!nameValidationResult.IsSuccess)
+                throw new Exception(nameValidationResult.ErrorMessage);
+
+            var emailValidationResult = VisitorValidator.ValidateEmail(visitorDto.Email);
+            if (!emailValidationResult.IsSuccess)
+                throw new Exception(emailValidationResult.ErrorMessage);
+
+            if (!VisitorValidator.ValidateVisitingCompanyId(visitorDto.VisitingCompanyId).IsSuccess)
+                throw new Exception("The visiting company is required.");
+            if (!VisitorValidator.ValidateAppointmentWithId(visitorDto.AppointmentWithId).IsSuccess)
+                throw new Exception("The employee which you have appointment is required.");
         }
     }
 }

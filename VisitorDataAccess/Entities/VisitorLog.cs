@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace VisitorDataAccess.Entities
 {
-    public class VisitorLog
+    public class VisitorLog : SoftDelete
     {
         public long Id { get; set; }
-        public Visit Visit {  get; set; }
+        public Visit Visit { get; set; }
         public Action Actions { get; set; }
-        public DateTime TimeSpent { get; set; }
+        public TimeSpan TimeSpent { get; set; }
     }
 
     public enum Action

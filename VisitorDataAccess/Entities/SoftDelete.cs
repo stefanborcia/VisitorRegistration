@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace VisitorDataAccess.Entities
 {
-    public class Employee : SoftDelete
+    public class SoftDelete
     {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public long CompanyId { get; set; }
-
+        public bool IsDeleted { get; set; } = false;
     }
 }

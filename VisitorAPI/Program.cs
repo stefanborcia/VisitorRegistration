@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using VisitorBusinessLogic.Services;
-using VisitorDataAccess;
-using VisitorDataAccess.Repositories.Interfaces;
-using VisitorDataAccess.Repositories;
 namespace VisitorAPI
 {
     public class Program
@@ -14,13 +11,8 @@ namespace VisitorAPI
             // Add services to the container.
             builder.Services.AddAuthorization();
 
-            //Register VisitorDbContext
-            builder.Services.AddDbContext<VisitorDbContext>(options =>
-                 options.UseSqlServer(builder.Configuration.GetConnectionString("VisitorManagementDb")));
-
-            // Register repositories
-            builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-            builder.Services.AddScoped<IVisitorRepository, VisitorRepository>();
+            //Registering the VisitorDataAccess to use the connection string 
+            builder.Services.AddVisitorDataAccess(builder.Configuration.GetConnectionString("VisitorManagementDb"));
 
             // Register services
             builder.Services.AddScoped<IVisitorService, VisitorService>();  
