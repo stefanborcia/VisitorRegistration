@@ -27,10 +27,5 @@ namespace VisitorDataAccess.Repositories
         {
             return await _dbContext.Set<Company>().ToListAsync();
         }
-
-        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId)
-        {
-            return await _dbContext.Set<Employee>().Where(e => e.CompanyId == companyId) .ToListAsync();
-        }
     }
 }

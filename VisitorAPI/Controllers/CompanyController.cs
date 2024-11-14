@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using VisitorBusinessLogic.Services;
+using VisitorBusinessLogic.Services.Interfaces;
+using VisitorDTOs;
 
 namespace VisitorAPI.Controllers
 {
@@ -15,20 +16,10 @@ namespace VisitorAPI.Controllers
         }
 
         [HttpGet("companies")]
-        public async Task<IActionResult> GetCompanies()
+        public async Task<ActionResult<List<CompanyDTO>>> GetCompanies()
         {
             var companies = await _companyService.GetAllCompaniesAsync();
-            return Ok(companies);
-        }
-
-        [HttpGet("companies/{companyId}/employees")]
-        public async Task<IActionResult> GetEmployeesByCompany(long companyId)
-        {
-            var employees = await _companyService.GetEmployeesByCompanyIdAsync(companyId);
-            if (!employees.Any())
-                return NotFound("No employees found for the given company.");
-
-            return Ok(employees);
+            return companies.Select(c => new CompanyDTO { Id = c.Id, Name = c.Name }).ToList();
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VisitorBusinessLogic.Services;
+using VisitorBusinessLogic.Services.Interfaces;
 namespace VisitorAPI
 {
     public class Program
@@ -7,6 +8,21 @@ namespace VisitorAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Define a named CORS policy
+            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+            // Register CORS policy with services collection before Build()
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                    policy =>
+                    {
+                        policy.WithOrigins("https://localhost:7185")  // Blazor app URL
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
 
             // Add services to the container.
             builder.Services.AddAuthorization();
@@ -17,6 +33,8 @@ namespace VisitorAPI
             // Register services
             builder.Services.AddScoped<IVisitorService, VisitorService>();  
             builder.Services.AddScoped<ICompanyService, CompanyService>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
             // Add controllers
             builder.Services.AddControllers();
@@ -33,9 +51,12 @@ namespace VisitorAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            // Configure the HTTP request pipeline.
 
+            // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
+
+            // Enable CORS for requests coming from the Blazor app
+            app.UseCors(MyAllowSpecificOrigins);
 
             app.UseAuthorization();
             app.MapControllers();

@@ -1,4 +1,5 @@
-﻿using VisitorDataAccess.Repositories.Interfaces;
+﻿using VisitorBusinessLogic.Services.Interfaces;
+using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDTOs;
 
 namespace VisitorBusinessLogic.Services
@@ -16,12 +17,6 @@ namespace VisitorBusinessLogic.Services
         {
             var companies = await _companyRepository.GetAllCompaniesAsync();
             return companies.Select(c => new CompanyDTO { Id = c.Id, Name = c.Name });
-        }
-
-        public async Task<IEnumerable<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId)
-        {
-            var employees = await _companyRepository.GetEmployeesByCompanyIdAsync(companyId);
-            return employees.Select(e => new EmployeeDTO { Id = e.Id, Name = e.Name });
         }
     }
 }

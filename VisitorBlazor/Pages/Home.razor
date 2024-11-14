@@ -1,7 +1,24 @@
 ﻿@page "/"
-
+@inject NavigationManager NavigationManager;
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
+    <h3>Welcome to the Visitor Management System!</h3>
+    <div style="display: flex; gap: 20px; justify-content: center;">
+        <button class="btn btn-primary" @onclick="NavigateToSignIn">Sign In</button>
+        <button class="btn btn-secondary" @onclick="NavigateToSignOut">Sign Out</button>
+    </div>
+</div>
 
-Welcome to your new app.
+@code {
+
+    private void NavigateToSignIn()
+    {
+        NavigationManager.NavigateTo("/visitor-sign-in");
+    }
+
+    private void NavigateToSignOut()
+    {
+        NavigationManager.NavigateTo("/visitor-sign-out");
+    }
+}

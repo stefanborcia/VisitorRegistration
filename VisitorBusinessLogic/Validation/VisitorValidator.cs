@@ -1,31 +1,25 @@
-﻿using System.Text.RegularExpressions;
+﻿using FluentValidation;
 using VisitorDTOs;
 
 namespace VisitorBusinessLogic.Validation
 {
-    public class VisitorValidator
+    public class VisitorValidator : AbstractValidator<SignInVisitorDTO>
     {
-        public static VisitorSignInResult ValidateName(string name) =>
-            string.IsNullOrWhiteSpace(name)
-                ? VisitorSignInResult.Fail("The name is required.") 
-                : name.Length >= 3
-                    ? VisitorSignInResult.Success() 
-                    : VisitorSignInResult.Fail("The name must contain at least 3 characters.");
+        public VisitorValidator()
+        {
+            RuleFor(visitor => visitor.Name)
+                .NotEmpty().WithMessage("The name is required.")
+                .MinimumLength(3).WithMessage("The name must contain at least 3 characters.");
 
-        public static VisitorSignInResult ValidateEmail(string email) =>
-            string.IsNullOrWhiteSpace(email)
-                ? VisitorSignInResult.Fail("The email is required.") 
-                : IsValidEmail(email)
-                    ? VisitorSignInResult.Success() 
-                    : VisitorSignInResult.Fail("You must enter a valid email.");
+            RuleFor(visitor => visitor.Email)
+                .NotEmpty().WithMessage("The email is required.")
+                .EmailAddress().WithMessage("You must enter a valid email.");
 
-        public static VisitorSignInResult ValidateVisitingCompanyId(long companyId) =>
-            companyId > 0 ? VisitorSignInResult.Success() : VisitorSignInResult.Fail("A valid visiting company is required.");
+            RuleFor(visitor => visitor.VisitingCompanyId)
+                .GreaterThan(0).WithMessage("A valid visiting company is required.");
 
-        public static VisitorSignInResult ValidateAppointmentWithId(long appointmentId) =>
-            appointmentId > 0 ? VisitorSignInResult.Success() : VisitorSignInResult.Fail("A valid appointment with an employee is required.");
-
-        private static bool IsValidEmail(string email) =>
-            Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+            RuleFor(visitor => visitor.AppointmentWithId)
+                .GreaterThan(0).WithMessage("A valid appointment with an employee is required.");
+        }
     }
 }

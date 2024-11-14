@@ -12,24 +12,26 @@ namespace VisitorDataAccess
         public DbSet<Visit> Visits { get; set; }
         public DbSet<VisitorLog> VisitorLogs { get; set; }
         public DbSet<Admin> Admins { get; set; }
-        public override int SaveChanges()
-        {
-            var entries = ChangeTracker.Entries()
-                .Where(e => e.State == EntityState.Deleted);
 
-            foreach (var entry in entries)
-            {
-                entry.State = EntityState.Modified;
-                var entity = entry.Entity;
-                var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
-                if (isDeletedProperty != null)
-                {
-                    isDeletedProperty.SetValue(entity, true);
-                }
-            }
+        //TODO SoftDelete
+        //public override int SaveChanges()
+        //{
+        //    var entries = ChangeTracker.Entries()
+        //        .Where(e => e.State == EntityState.Deleted);
 
-            return base.SaveChanges();
-        }
+        //    foreach (var entry in entries)
+        //    {
+        //        entry.State = EntityState.Modified;
+        //        var entity = entry.Entity;
+        //        var isDeletedProperty = entity.GetType().GetProperty("IsDeleted");
+        //        if (isDeletedProperty != null)
+        //        {
+        //            isDeletedProperty.SetValue(entity, true);
+        //        }
+        //    }
+
+        //    return base.SaveChanges();
+        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Visit>()
@@ -46,8 +48,8 @@ namespace VisitorDataAccess
             modelBuilder.Entity<Company>().HasQueryFilter(c => !c.IsDeleted);
             modelBuilder.Entity<Employee>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Visitor>().HasQueryFilter(v => !v.IsDeleted);
-            modelBuilder.Entity<Visit>().HasQueryFilter(v => v.EndTime == null || v.EndTime > DateTime.Now);
-            modelBuilder.Entity<VisitorLog>().HasQueryFilter(vl => vl.TimeSpent > TimeSpan.Zero);
+            //modelBuilder.Entity<Visit>().HasQueryFilter(v => v.EndTime == null || v.EndTime > DateTime.Now);
+            //modelBuilder.Entity<VisitorLog>().HasQueryFilter(vl => vl.TimeSpent > TimeSpan.Zero);
 
             // Define keys
             modelBuilder.Entity<Company>().HasKey(c => c.Id);
@@ -59,6 +61,7 @@ namespace VisitorDataAccess
 
             // Define string lengths and optional EndTime
             modelBuilder.Entity<Company>().Property(c => c.Name).HasMaxLength(50).IsRequired();
+            modelBuilder.Entity<Visitor>().Property(v => v.Company).HasMaxLength(50).IsRequired(false);
             modelBuilder.Entity<Employee>().Property(e => e.Name).HasMaxLength(20).IsRequired();
             modelBuilder.Entity<Visit>().Property(v => v.EndTime).IsRequired(false);
 

@@ -14,7 +14,7 @@ namespace VisitorDTOs
 
         public string Email { get; set; }
 
-        public string Company { get; set; }
+        public string? Company { get; set; }
 
         public long VisitingCompanyId { get; set; }
 

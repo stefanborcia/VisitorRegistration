@@ -34,11 +34,5 @@ namespace VisitorDataAccess.Repositories
         {
             return await _dbContext.Set<Visit>().FirstOrDefaultAsync(v => v.Visitor.Id == visitorId && v.EndTime == null);
         }
-
-        public async Task UpdateVisitAsync(Visit visit)
-        {
-            _dbContext.Set<Visit>().Update(visit);
-            await _dbContext.SaveChangesAsync();
-        }
     }
 }

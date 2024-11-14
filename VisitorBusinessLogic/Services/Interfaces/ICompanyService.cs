@@ -1,10 +1,9 @@
 ﻿using VisitorDTOs;
 
-namespace VisitorBusinessLogic.Services
+namespace VisitorBusinessLogic.Services.Interfaces
 {
     public interface ICompanyService
     {
         Task<IEnumerable<CompanyDTO>> GetAllCompaniesAsync();
-        Task<IEnumerable<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId);
     }
 }

@@ -1,0 +1,173 @@
+﻿@page "/visitor-sign-in"
+@inject HttpClient Http
+@inject IValidator<SignInVisitorDTO> Validator
+@inject NavigationManager NavigationManager
+@using FluentValidation
+@using FluentValidation.Results
+@using VisitorBusinessLogic.Exceptions
+@using VisitorDTOs
+
+<h3 class="text-center">Visitor Sign-In</h3>
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="col-md-8">
+
+        <EditForm Model="Visitor" OnValidSubmit="HandleValidSubmit">
+            <ValidationSummary />
+
+            <!-- Row for Name and Email -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Name:</label>
+                    <InputText @bind-Value="Visitor.Name" class="form-control" />
+                    @if (ValidationErrors.ContainsKey(nameof(Visitor.Name)))
+                    {
+                        <span class="text-danger">@ValidationErrors[nameof(Visitor.Name)]</span>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <label>Email:</label>
+                    <InputText @bind-Value="Visitor.Email" type="email" class="form-control" />
+                    @if (ValidationErrors.ContainsKey(nameof(Visitor.Email)))
+                    {
+                        <span class="text-danger">@ValidationErrors[nameof(Visitor.Email)]</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Row for Company (Centered and full-width in this form section) -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label>Company:</label>
+                    <InputText @bind-Value="Visitor.Company" class="form-control" />
+                </div>
+            </div>
+
+            <!-- Row for Visiting Company and Appointment With -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Visiting Company:</label>
+                    <InputSelect @bind-Value="Visitor.VisitingCompanyId" class="form-control" @oninput="OnVisitingCompanyChanged">
+                        <option value="">--Select Company--</option>
+                        @foreach (var company in Companies)
+                        {
+                            <option value="@company.Id">@company.Name</option>
+                        }
+                    </InputSelect>
+                    @if (ValidationErrors.ContainsKey(nameof(Visitor.VisitingCompanyId)))
+                    {
+                        <span class="text-danger">@ValidationErrors[nameof(Visitor.VisitingCompanyId)]</span>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <label>Appointment With:</label>
+                    <InputSelect @bind-Value="Visitor.AppointmentWithId" class="form-control">
+                        <option value="">--Select Employee--</option>
+                        @foreach (var employee in AppointmentOptions)
+                        {
+                            <option value="@employee.Id">@employee.Name</option>
+                        }
+                    </InputSelect>
+                    @if (ValidationErrors.ContainsKey(nameof(Visitor.AppointmentWithId)))
+                    {
+                        <span class="text-danger">@ValidationErrors[nameof(Visitor.AppointmentWithId)]</span>
+                    }
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+
+            @if (SuccessMessage != null)
+            {
+                <p class="text-success text-center mt-3">@SuccessMessage</p>
+            }
+
+            @if (ErrorMessage != null)
+            {
+                <p class="text-danger text-center mt-3">@ErrorMessage</p>
+            }
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private SignInVisitorDTO Visitor = new();
+    private List<CompanyDTO> Companies = new();
+    private List<EmployeeDTO> AppointmentOptions = new();
+    private Dictionary<string, string> ValidationErrors = new();
+
+    private string? SuccessMessage;
+    private string? ErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Companies = await Http.GetFromJsonAsync<List<CompanyDTO>>("api/company/companies") ?? new List<CompanyDTO>();
+    }
+
+    private async Task OnVisitingCompanyChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value.ToString(), out var companyId) && companyId > 0)
+        {
+            Visitor.VisitingCompanyId = companyId;
+            AppointmentOptions = await Http.GetFromJsonAsync<List<EmployeeDTO>>($"api/Employee/{companyId}/employees") ?? new List<EmployeeDTO>();
+        }
+        else
+        {
+            AppointmentOptions.Clear();
+            Visitor.AppointmentWithId = 0;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        ValidationResult result = await Validator.ValidateAsync(Visitor);
+
+        if (!result.IsValid)
+        {
+            // Handle validation errors as before
+            foreach (var error in result.Errors)
+            {
+                ValidationErrors[error.PropertyName] = error.ErrorMessage;
+            }
+            ErrorMessage = "Please correct the errors and try again.";
+            SuccessMessage = null;
+        }
+        else
+        {
+            ValidationErrors.Clear();
+            ErrorMessage = null;
+
+            try
+            {
+                var response = await Http.PostAsJsonAsync("api/visitorapi/sign-in", Visitor);
+                if (response.IsSuccessStatusCode)
+                {
+                    SuccessMessage = "Visitor signed in successfully.";
+
+                    // Force re-render to update the UI
+                    StateHasChanged();
+
+                    // Delay and redirect after re-render
+                    await Task.Delay(2000);
+                    NavigationManager.NavigateTo("/");
+                }
+                else
+                {
+                    ErrorMessage = await response.Content.ReadAsStringAsync();
+                    StateHasChanged();
+                }
+            }
+            catch (VisitorAlreadySignedInException ex)
+            {
+                // Handle the custom error for already signed-in visitors
+                ErrorMessage = ex.Message;  
+                StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"An error occurred: {ex.Message}";
+                StateHasChanged();
+            }
+        }
+    }
+}
