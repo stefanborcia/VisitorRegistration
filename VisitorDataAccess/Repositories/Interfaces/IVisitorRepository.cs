@@ -7,6 +7,9 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task AddVisitorAsync(Visitor visitor);          
         Task<Visitor> GetVisitorByEmailAsync(string email); 
         Task<Visit> GetActiveVisitByVisitorAsync(long visitorId);
-         //Task SignOutVisitorAsync(string email);
+        Task UpdateVisitAsync(Visit activeVisit);
+        Task CreateVisitAsync(Visit newVisit);
+        Task CreateVisitorLogAsync(VisitorLog visitorLog);
+        Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId);
     }
 }

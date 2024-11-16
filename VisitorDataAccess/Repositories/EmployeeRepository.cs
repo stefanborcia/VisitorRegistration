@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
 
@@ -14,11 +13,22 @@ namespace VisitorDataAccess.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyId(long companyId)
+        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId)
         {
             return await _context.Set<Employee>()
                                  .Where(e => e.CompanyId == companyId)
                                  .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync()
+        {
+            return await _context.Set<Employee>().ToListAsync();
+        }
+
+        public async Task<Employee> GetEmployeeByIdAsync(long Id)
+        {
+            return await _context.Set<Employee>().FirstOrDefaultAsync(e => e.Id == Id);
+            ;
         }
     }
 }

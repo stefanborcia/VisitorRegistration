@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using VisitorBusinessLogic.Exceptions;
 using VisitorBusinessLogic.Services.Interfaces;
 using VisitorDTOs;
+using ValidationException = VisitorBusinessLogic.Exceptions.ValidationException;
 
 namespace VisitorAPI.Controllers
 {
@@ -15,24 +17,46 @@ namespace VisitorAPI.Controllers
         {
             _visitorService = visitorService;
         }
-
-        [HttpPost("sign-in")]
+        [HttpPost("signin")]
         public async Task<IActionResult> SignIn([FromBody] SignInVisitorDTO visitorDto)
         {
             try
             {
-                await _visitorService.RegisterVisitorAsync(visitorDto);
-                return Ok("Visitor signed in successfully.");
+                var visitor = await _visitorService.RegisterVisitorAsync(visitorDto);
+                return Ok(new { Message = "Visitor signed in successfully.", Visitor = visitor });
+            }
+            catch (ValidationException ex)
+            {
+                // Return all validation errors at once
+                return BadRequest(new { Errors = ex.ValidationErrors });
             }
             catch (VisitorAlreadySignedInException ex)
             {
-                return BadRequest($"Error: {ex.Message}");  // This will display the custom error message
+                return BadRequest(new { Message = ex.Message });
             }
             catch (Exception ex)
             {
-                return BadRequest($"Error: {ex.Message}");  // Generic error handling
+                return StatusCode(500, new { Message = "An error occurred.", Details = ex.Message });
             }
         }
 
+        [HttpPost("signout")]
+        public async Task<IActionResult> SignOut([FromBody] SignOutVisitorDTO visitorDto)
+        {
+            try
+            {
+                // Pass the entire DTO
+                await _visitorService.SignOutVisitorAsync(visitorDto);
+                return Ok("Visitor signed out successfully.");
+            }
+            catch (VisitorNotSignedInException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred.", Details = ex.Message });
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ using FluentValidation;
 using VisitorBusinessLogic.Validation;
 using VisitorDTOs;
 
-namespace VisitorBusinessLogic.Services
+namespace VisitorBusinessLogic.Configuration
 {
     public static class VisitorDataAccessConfiguration
     {
@@ -21,7 +21,9 @@ namespace VisitorBusinessLogic.Services
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IVisitorRepository, VisitorRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-            services.AddScoped<IValidator<SignInVisitorDTO>, VisitorValidator>();
+
+            // Add validation services
+            services.AddValidationServices();
 
             return services;
         }

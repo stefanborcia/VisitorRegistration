@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
+using Action = VisitorDataAccess.Entities.Action;
 
 namespace VisitorDataAccess.Repositories
 {
@@ -33,6 +34,22 @@ namespace VisitorDataAccess.Repositories
         public async Task<Visit> GetActiveVisitByVisitorAsync(long visitorId)
         {
             return await _dbContext.Set<Visit>().FirstOrDefaultAsync(v => v.Visitor.Id == visitorId && v.EndTime == null);
+        }
+        public async Task UpdateVisitAsync(Visit visit)
+        {
+            _dbContext.Set<Visit>().Update(visit);
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task CreateVisitorLogAsync(VisitorLog visitorLog)
+        {
+            _dbContext.VisitorLogs.Add(visitorLog);
+            await _dbContext.SaveChangesAsync();
+        }
+        public async Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId)
+        {
+            return await _dbContext.Visits
+                .Where(v => v.AppointmentWith.Id == employeeId && v.CurrentStatus == Action.SignIn)
+                .ToListAsync();
         }
     }
 }

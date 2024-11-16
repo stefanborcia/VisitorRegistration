@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using VisitorBusinessLogic.Configuration;
 using VisitorBusinessLogic.Services;
 using VisitorBusinessLogic.Services.Interfaces;
 namespace VisitorAPI
@@ -29,15 +30,14 @@ namespace VisitorAPI
 
             //Registering the VisitorDataAccess to use the connection string 
             builder.Services.AddVisitorDataAccess(builder.Configuration.GetConnectionString("VisitorManagementDb"));
-
-            // Register services
-            builder.Services.AddScoped<IVisitorService, VisitorService>();  
-            builder.Services.AddScoped<ICompanyService, CompanyService>();
-            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-
+            builder.Services.AddBusinessLogicServices();
 
             // Add controllers
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                    .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                    });
 
             // Add Swagger services
             builder.Services.AddEndpointsApiExplorer();

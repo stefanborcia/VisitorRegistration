@@ -6,6 +6,8 @@ using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDataAccess.Repositories;
 using VisitorBusinessLogic.Services.Interfaces;
 using VisitorBusinessLogic.Services;
+using VisitorDTOs;
+using VisitorBusinessLogic.Configuration;
 namespace VisitorBlazor
 {
     public class Program
@@ -18,16 +20,10 @@ namespace VisitorBlazor
 
             // Load API base address from configuration
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7162/") });
-
-
             builder.Services.AddScoped<IVisitorRepository, VisitorRepository>();
 
-            //Register validator
-            builder.Services.AddScoped<IValidator<VisitorDTOs.SignInVisitorDTO>, VisitorValidator>();
-
-            //Register service 
-            builder.Services.AddScoped<IVisitorService, VisitorService>();
-            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            // Add business logic services (includes validation)
+            builder.Services.AddBusinessLogicServices();
 
             await builder.Build().RunAsync();
         }

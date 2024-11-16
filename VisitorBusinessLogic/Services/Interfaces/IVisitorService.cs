@@ -5,6 +5,7 @@ namespace VisitorBusinessLogic.Services.Interfaces
 {
     public interface IVisitorService
     {
-        Task<Visitor> RegisterVisitorAsync(SignInVisitorDTO visitorDto);
+        Task<Visit> RegisterVisitorAsync(SignInVisitorDTO visitorDto);
+        Task SignOutVisitorAsync(SignOutVisitorDTO visitorDto);
     }
 }
