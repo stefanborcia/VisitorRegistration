@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using VisitorBusinessLogic.Configuration;
-using VisitorBusinessLogic.Services;
-using VisitorBusinessLogic.Services.Interfaces;
 namespace VisitorAPI
 {
     public class Program

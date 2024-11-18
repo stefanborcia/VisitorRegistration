@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using VisitorBusinessLogic.Services.Interfaces;
-using VisitorDataAccess.Entities;
+﻿using VisitorBusinessLogic.Services.Interfaces;
 using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDTOs;
 
@@ -17,10 +15,8 @@ namespace VisitorBusinessLogic.Services
 
         public async Task<List<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId)
         {
-            // Get the employees for the given companyId
             var employees = await _employeeRepository.GetEmployeesByCompanyIdAsync(companyId);
 
-            // You can map the data if necessary
             return employees.Select(e => new EmployeeDTO
             {
                 Id = e.Id,

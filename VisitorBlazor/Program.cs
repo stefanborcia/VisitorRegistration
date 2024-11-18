@@ -1,12 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using VisitorBusinessLogic.Validation;
-using FluentValidation;
 using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDataAccess.Repositories;
-using VisitorBusinessLogic.Services.Interfaces;
-using VisitorBusinessLogic.Services;
-using VisitorDTOs;
 using VisitorBusinessLogic.Configuration;
 namespace VisitorBlazor
 {

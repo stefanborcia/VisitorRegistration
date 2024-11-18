@@ -3,9 +3,6 @@ using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using VisitorDataAccess;
-using FluentValidation;
-using VisitorBusinessLogic.Validation;
-using VisitorDTOs;
 
 namespace VisitorBusinessLogic.Configuration
 {
@@ -21,6 +18,9 @@ namespace VisitorBusinessLogic.Configuration
             services.AddScoped<ICompanyRepository, CompanyRepository>();
             services.AddScoped<IVisitorRepository, VisitorRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            // Register Generic Repository
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
             // Add validation services
             services.AddValidationServices();
