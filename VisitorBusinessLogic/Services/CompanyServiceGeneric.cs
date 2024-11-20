@@ -31,6 +31,15 @@ namespace VisitorBusinessLogic.Services
 
         public async Task<CompanyDTO> AddCompanyAsync(CompanyDTO companyDto)
         {
+            // Check if company already exists
+            var existingCompany = await _repository.GetCompanyByNameAsync(companyDto.Name);
+            if (existingCompany != null)
+            {
+                // If a company with the same name exists, throw an exception or return a specific error
+                throw new InvalidOperationException("A company with the same name already exists.");
+            }
+
+            // Add the new company
             var company = new Company
             {
                 Name = companyDto.Name

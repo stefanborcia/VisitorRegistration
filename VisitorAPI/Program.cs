@@ -27,7 +27,14 @@ namespace VisitorAPI
             builder.Services.AddAuthorization();
 
             //Registering the VisitorDataAccess to use the connection string 
-            builder.Services.AddVisitorDataAccess(builder.Configuration.GetConnectionString("VisitorManagementDb"));
+            var connectionString = builder.Configuration.GetConnectionString("VisitorManagementDb");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'VisitorManagementDb' is not configured.");
+            }
+            builder.Services.AddVisitorDataAccess(connectionString);
+
             builder.Services.AddBusinessLogicServices();
 
             // Add controllers
@@ -36,6 +43,7 @@ namespace VisitorAPI
                     {
                         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
                     });
+
 
             // Add Swagger services
             builder.Services.AddEndpointsApiExplorer();

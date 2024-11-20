@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 @using FluentValidation
 @using FluentValidation.Results
-@using VisitorBusinessLogic.Exceptions
+@using System.Text.Json
 @using VisitorDTOs
 
 <h3 class="text-center">Visitor Sign-In</h3>
@@ -39,7 +39,7 @@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <label>Company:</label>
-                    <InputText @bind-Value="Visitor.Company" class="form-control" />
+                    <InputText @bind-Value="Visitor.Company" class="form-control" placeholder="Optional" />
                 </div>
             </div>
 
@@ -87,6 +87,7 @@
                 <p class="text-danger text-center mt-3">@ErrorMessage</p>
             }
         </EditForm>
+
     </div>
 </div>
 
@@ -95,26 +96,36 @@
     private List<CompanyDTO> Companies = new();
     private List<EmployeeDTO> AppointmentOptions = new();
     private Dictionary<string, string> ValidationErrors = new();
-
     private string? SuccessMessage;
     private string? ErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        Companies = await Http.GetFromJsonAsync<List<CompanyDTO>>("api/company/companies") ?? new List<CompanyDTO>();
+        var response = await Http.GetAsync("api/companies");
+
+        if (response.IsSuccessStatusCode)
+        {
+            string jsonResp = await response.Content.ReadAsStringAsync();
+
+            // Deserialize the JSON string into a CompanyResponse object using case-insensitive property matching
+            var companyResp = JsonSerializer.Deserialize<CompanyResponse>(jsonResp, new JsonSerializerOptions
+                {
+                    // Ensures property names in the JSON are matched regardless of case
+                    PropertyNameCaseInsensitive = true
+                });
+
+            // If companyResp is null, assign an empty list to Companies.
+            Companies = companyResp?.Values ?? new List<CompanyDTO>();
+        }
     }
 
     private async Task OnVisitingCompanyChanged(ChangeEventArgs e)
     {
-        if (long.TryParse(e.Value.ToString(), out var companyId) && companyId > 0)
+        if (long.TryParse(e.Value?.ToString(), out var companyId) && companyId > 0)
         {
             Visitor.VisitingCompanyId = companyId;
-            AppointmentOptions = await Http.GetFromJsonAsync<List<EmployeeDTO>>($"api/Employee/{companyId}/employees") ?? new List<EmployeeDTO>();
-        }
-        else
-        {
-            AppointmentOptions.Clear();
-            Visitor.AppointmentWithId = 0;
+            var response = await Http.GetFromJsonAsync<EmployeeApiResponse>($"api/company/{companyId}/employees");
+            AppointmentOptions = response?.Values ?? new List<EmployeeDTO>();
         }
     }
 
@@ -124,7 +135,8 @@
 
         if (!result.IsValid)
         {
-            // Handle validation errors as before
+            // Handle validation errors
+            ValidationErrors.Clear();
             foreach (var error in result.Errors)
             {
                 ValidationErrors[error.PropertyName] = error.ErrorMessage;
@@ -134,38 +146,28 @@
         }
         else
         {
+            // Clear previous validation errors and messages
             ValidationErrors.Clear();
             ErrorMessage = null;
 
-            try
-            {
-                var response = await Http.PostAsJsonAsync("api/visitorapi/sign-in", Visitor);
-                if (response.IsSuccessStatusCode)
-                {
-                    SuccessMessage = "Visitor signed in successfully.";
+            // Proceed with API call if validation succeeds
+            var response = await Http.PostAsJsonAsync("api/signin", Visitor);
 
-                    // Force re-render to update the UI
-                    StateHasChanged();
-
-                    // Delay and redirect after re-render
-                    await Task.Delay(2000);
-                    NavigationManager.NavigateTo("/");
-                }
-                else
-                {
-                    ErrorMessage = await response.Content.ReadAsStringAsync();
-                    StateHasChanged();
-                }
-            }
-            catch (VisitorAlreadySignedInException ex)
+            if (response.IsSuccessStatusCode)
             {
-                // Handle the custom error for already signed-in visitors
-                ErrorMessage = ex.Message;  
+                // Success message and reset form
+                SuccessMessage = "Visitor signed in successfully.";
+                Visitor = new SignInVisitorDTO(); // Reset the form
+
+                // Force UI re-render and redirect after a short delay
                 StateHasChanged();
+                await Task.Delay(2000);
+                NavigationManager.NavigateTo("/");
             }
-            catch (Exception ex)
+            else
             {
-                ErrorMessage = $"An error occurred: {ex.Message}";
+                // Display the error message received from the API
+                ErrorMessage = await response.Content.ReadAsStringAsync();
                 StateHasChanged();
             }
         }

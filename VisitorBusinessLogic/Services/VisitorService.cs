@@ -3,6 +3,7 @@ using VisitorBusinessLogic.Exceptions;
 using VisitorBusinessLogic.Services.Interfaces;
 using VisitorBusinessLogic.Validation;
 using VisitorDataAccess.Entities;
+using VisitorDataAccess.Repositories;
 using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDTOs;
 using Action = VisitorDataAccess.Entities.Action;
@@ -13,13 +14,13 @@ namespace VisitorBusinessLogic.Services
     public class VisitorService : IVisitorService
     {
         private readonly IVisitorRepository _visitorRepository;
-        private readonly ICompanyRepository _companyRepository;
-        private readonly IEmployeeRepository _employeeRepository;
+        private readonly IGenericRepository<Company> _companyRepository;
+        private readonly IGenericRepository<Employee> _employeeRepository;
 
         public VisitorService(
             IVisitorRepository visitorRepository,
-            ICompanyRepository companyRepository,
-            IEmployeeRepository employeeRepository)
+            IGenericRepository<Company> companyRepository,
+            IGenericRepository<Employee> employeeRepository)
         {
             _visitorRepository = visitorRepository;
             _companyRepository = companyRepository;
@@ -81,13 +82,13 @@ namespace VisitorBusinessLogic.Services
 
         private async Task<Visit> CreateAndStoreVisitAsync(Visitor visitor, SignInVisitorDTO visitorDto)
         {
-            // Fetch the visiting company by its ID from the repository.
-            var visitingCompany = await _companyRepository.GetCompanyByIdAsync(visitorDto.VisitingCompanyId)
-                                ?? throw new Exception("Visiting company not found.");
+            // Fetch the visiting company by its ID using the generic repository.
+            var visitingCompany = await _companyRepository.GetRecordsByIdAsync(visitorDto.VisitingCompanyId)
+                ?? throw new Exception("Visiting company not found.");
 
-            // Fetch the employee by their ID from the repository to verify the appointment.
-            var appointmentWith = await _employeeRepository.GetEmployeeByIdAsync(visitorDto.AppointmentWithId)
-                                ?? throw new Exception("Appointment employee not found.");
+            // Fetch the employee by their ID using the generic repository.
+            var appointmentWith = await _employeeRepository.GetRecordsByIdAsync(visitorDto.AppointmentWithId)
+                ?? throw new Exception("Appointment employee not found.");
 
             // Create a new visit
             var visit = new Visit
@@ -96,11 +97,11 @@ namespace VisitorBusinessLogic.Services
                 VisitingCompany = visitingCompany,
                 AppointmentWith = appointmentWith,
                 StartTime = DateTime.Now,
-                CurrentStatus = Action.SignIn 
+                CurrentStatus = Action.SignIn
             };
 
             // Store the visit in the database
-            await _visitorRepository.CreateVisitAsync(visit);
+            await _visitorRepository.AddRecordsAsync(visit);
 
             return visit;
         }
@@ -135,11 +136,6 @@ namespace VisitorBusinessLogic.Services
             activeVisit.EndTime = DateTime.Now;
             activeVisit.CurrentStatus = Action.SignOut;
 
-            // Calculate time spent
-            if (activeVisit.StartTime == null || activeVisit.EndTime == null)
-            {
-                throw new Exception("Invalid visit times for calculating time spent.");
-            }
             var timeSpent = activeVisit.EndTime.Value - activeVisit.StartTime;
 
             // Log the visit

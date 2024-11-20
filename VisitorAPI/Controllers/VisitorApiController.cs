@@ -5,7 +5,7 @@ using VisitorDTOs;
 
 namespace VisitorAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class VisitorApiController : ControllerBase
     {

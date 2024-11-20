@@ -1,0 +1,194 @@
+﻿@page "/company-management"
+@using System.Text.Json
+@using VisitorDTOs
+@inject HttpClient Http
+
+<h3>Company Management</h3>
+
+<!-- Button to add a new company, positioned on the right -->
+<div class="mb-3 text-end">
+    <button class="btn btn-primary" @onclick="ShowAddCompanyForm">Add Company</button>
+</div>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger mt-2">
+        @ErrorMessage
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(SuccessMessage))
+{
+    <div class="alert alert-success mt-2">
+        @SuccessMessage
+    </div>
+}
+
+<!-- Form for adding a new company (appears when clicked) -->
+@if (isAddCompanyVisible)
+{
+    <div class="mb-3">
+        <label for="companyName" class="form-label">Company Name</label>
+        <input type="text" id="companyName" class="form-control" @bind="newCompany.Name" />
+        <button class="btn btn-success mt-2" @onclick="AddCompany">Save</button>
+        <button class="btn btn-secondary mt-2 ms-2" @onclick="HideAddCompanyForm">Cancel</button>
+    </div>
+}
+
+<!-- Form for editing a company (appears when editing) -->
+@if (editingCompany != null)
+{
+    <div class="mb-3">
+        <label for="editCompanyName" class="form-label">Edit Company Name</label>
+        <input type="text" id="editCompanyName" class="form-control" @bind="editingCompany.Name" />
+        <button class="btn btn-success mt-2" @onclick="UpdateCompany">Save</button>
+        <button class="btn btn-secondary mt-2 ms-2" @onclick="CancelEdit">Cancel</button>
+    </div>
+}
+
+<!-- Table for displaying companies -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var company in Companies)
+        {
+            <tr>
+                <td>@company.Name</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" @onclick="() => EditCompany(company)">Edit</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteCompany(company.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<CompanyDTO> Companies = new();
+    private CompanyDTO newCompany = new CompanyDTO();
+    private CompanyDTO editingCompany = null;
+    private bool isAddCompanyVisible = false; //  visibility of the Add Company form
+    private string ErrorMessage = string.Empty;
+    private string SuccessMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchCompanies();
+    }
+
+    // Fetch companies from the API
+    private async Task FetchCompanies()
+    {
+        var response = await Http.GetAsync("api/companies");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var companyResp = await response.Content.ReadFromJsonAsync<CompanyResponse>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            Companies = companyResp?.Values ?? new List<CompanyDTO>();
+        }
+    }
+
+    // Add a new company
+    private async Task AddCompany()
+    {
+        var response = await Http.PostAsJsonAsync("api/company", newCompany);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var createdCompany = await response.Content.ReadFromJsonAsync<CompanyDTO>();
+            Companies.Add(createdCompany);
+            newCompany = new CompanyDTO();
+            isAddCompanyVisible = false;
+            SuccessMessage = "Company added successfully!";
+            ClearMessages();
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            ErrorMessage = errorMessage;
+            ClearMessages();
+        }
+    }
+
+    // Show the "Add Company" form
+    private void ShowAddCompanyForm()
+    {
+        isAddCompanyVisible = true;
+    }
+
+    // Hide the "Add Company" form
+    private void HideAddCompanyForm()
+    {
+        isAddCompanyVisible = false;
+    }
+
+    // Edit a company
+    private Task EditCompany(CompanyDTO company)
+    {
+        editingCompany = new CompanyDTO
+            {
+                Id = company.Id,
+                Name = company.Name
+            };
+        return Task.CompletedTask;
+    }
+
+    // Update a company
+    private async Task UpdateCompany()
+    {
+if (editingCompany != null)
+{
+    var response = await Http.PutAsJsonAsync($"api/company/{editingCompany.Id}", editingCompany);
+    if (response.IsSuccessStatusCode)
+    {
+        await FetchCompanies();
+        editingCompany = null; // Now valid
+        SuccessMessage = "Company updated successfully!";
+        ClearMessages();
+    }
+}
+    }
+
+    // Cancel editing a company
+    private void CancelEdit()
+    {
+        editingCompany = null;
+    }
+
+    // Delete a company
+    private async Task DeleteCompany(long companyId)
+    {
+        var response = await Http.DeleteAsync($"api/company/{companyId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var company = Companies.FirstOrDefault(c => c.Id == companyId);
+            if (company != null)
+            {
+                Companies.Remove(company);
+                SuccessMessage = "Company deleted successfully!";
+                ClearMessages();
+            }
+        }
+    }
+
+    // Clear success and error messages after a short delay
+    private void ClearMessages()
+    {
+        Task.Delay(3000).ContinueWith(_ =>
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            StateHasChanged();
+        });
+    }
+}

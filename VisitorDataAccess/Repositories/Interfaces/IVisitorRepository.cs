@@ -11,5 +11,6 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task CreateVisitAsync(Visit newVisit);
         Task CreateVisitorLogAsync(VisitorLog visitorLog);
         Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId);
+        Task AddRecordsAsync(Visit visit);
     }
 }

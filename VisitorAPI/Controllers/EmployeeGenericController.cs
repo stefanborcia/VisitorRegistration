@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VisitorBusinessLogic.Services.Interfaces;
+using VisitorDataAccess.Entities;
 using VisitorDTOs;
 
 namespace VisitorAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class EmployeeGenericController : ControllerBase
     {
@@ -12,18 +13,29 @@ namespace VisitorAPI.Controllers
 
         public EmployeeGenericController(IEmployeeServiceGeneric employeeService) => _employeeService = employeeService;
 
-        [HttpGet("/employees")]
+        [HttpGet("employees")]
         public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetAllEmployees()
         {
             var employees = await _employeeService.GetEmployeesAsync();
+            if (employees == null)
+                return NotFound(new { message = "Employees not found." });
+
             return Ok(new
             {
                 message = "Employees retrieved successfully.",
                 data = employees
             });
         }
+        [HttpGet("company/{companyId}/employees")]
+        public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetEmployeesByCompanyId(long companyId)
+        {
+            var employees = await _employeeService.GetEmployeesByCompanyIdAsync(companyId);
+            if (employees == null || !employees.Any())
+                return NotFound(new { message = "No employees found for this company." });
 
-        [HttpGet("/employee/{id}")]
+            return Ok(employees);
+        }
+        [HttpGet("employee/{id}")]
         public async Task<ActionResult<EmployeeDTO>> GetEmployeeById(long id)
         {
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
@@ -37,7 +49,7 @@ namespace VisitorAPI.Controllers
             });
         }
 
-        [HttpPost("/add/employee/")]
+        [HttpPost("employee/")]
        public async Task<ActionResult> AddEmployee(long companyId, [FromBody] EmployeeDTO employeeDto)
         {
             try
@@ -55,7 +67,7 @@ namespace VisitorAPI.Controllers
             }
         }
 
-        [HttpPut("/edit/employee/{id}")]
+        [HttpPut("employee/{id}")]
         public async Task<ActionResult> UpdateEmployee(long id, EmployeeDTO employeeDto)
         {
             if (id != employeeDto.Id)
@@ -65,7 +77,7 @@ namespace VisitorAPI.Controllers
             return Ok(new { message = "Employee updated successfully.", data = employeeDto });
         }
 
-        [HttpDelete("/delete/employee/{id}")]
+        [HttpDelete("employee/{id}")]
         public async Task<ActionResult> DeleteEmployee(long id)
         {
             await _employeeService.DeleteEmployeeAsync(id);

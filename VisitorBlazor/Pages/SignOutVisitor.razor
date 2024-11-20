@@ -1,0 +1,86 @@
+﻿@page "/visitor-sign-out"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using VisitorDTOs
+
+<h3 class="text-center">Visitor Sign-Out</h3>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="col-md-6 card p-4 shadow-lg">
+        @if (!SignOutComplete)
+        {
+            <div>
+                <div class="form-group mb-3">
+                    <label>Email:</label>
+                    <InputText @bind-Value="Visitor.Email" class="form-control" />
+                    @if (ValidationErrors.ContainsKey(nameof(Visitor.Email)))
+                    {
+                        <span class="text-danger">@ValidationErrors[nameof(Visitor.Email)]</span>
+                    }
+                </div>
+
+                <button @onclick="HandleSignOut" class="btn btn-danger w-100">Sign Out</button>
+
+                @if (ErrorMessage != null)
+                {
+                    <p class="text-danger text-center mt-3">@ErrorMessage</p>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Thank You Message -->
+            <div class="text-center">
+                <h4 class="text-success mt-4">@SuccessMessage</h4>
+                <p class="text-muted mt-2">Thank you for your visit! You are always welcome.</p>
+                <p class="text-muted mt-2">Redirecting to home...</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private SignOutVisitorDTO Visitor = new SignOutVisitorDTO();
+    private Dictionary<string, string> ValidationErrors = new();
+    private string? SuccessMessage;
+    private string? ErrorMessage;
+    private bool SignOutComplete = false;
+
+    private async Task HandleSignOut()
+    {
+        ValidationErrors.Clear();
+        ErrorMessage = null;
+
+        // Validate input
+        if (string.IsNullOrWhiteSpace(Visitor.Email))
+        {
+            ValidationErrors[nameof(Visitor.Email)] = "Email is required.";
+            ErrorMessage = "Please correct the errors above.";
+            StateHasChanged(); // Trigger UI update after validation error
+            return;
+        }
+
+        // Attempt sign-out
+        var response = await Http.PostAsJsonAsync("api/signout", Visitor);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Success
+            SuccessMessage = "You have successfully signed out.";
+            SignOutComplete = true;
+
+            // Trigger re-render to show success message
+            StateHasChanged();
+
+            // Wait for 4 seconds and then redirect
+            await Task.Delay(4000);
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            // Handle error
+            ErrorMessage = "An error occurred during sign-out. Please try again.";
+            StateHasChanged(); // Trigger UI update after setting error message
+        }
+    }
+}

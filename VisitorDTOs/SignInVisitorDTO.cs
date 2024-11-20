@@ -14,5 +14,10 @@ namespace VisitorDTOs
         public long VisitingCompanyId { get; set; }
 
         public long AppointmentWithId { get; set; }
+        public SignInVisitorDTO()
+        {
+            Name = string.Empty; 
+            Email = string.Empty;
+        }
     }
 }

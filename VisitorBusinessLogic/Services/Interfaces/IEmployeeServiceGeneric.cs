@@ -9,5 +9,6 @@ namespace VisitorBusinessLogic.Services.Interfaces
         Task<EmployeeDTO> AddEmployeeAsync(long companyId, EmployeeDTO employeeDto); 
         Task UpdateEmployeeAsync(EmployeeDTO employeeDto);
         Task DeleteEmployeeAsync(long id);
+        Task<IEnumerable<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId);
     }
 }

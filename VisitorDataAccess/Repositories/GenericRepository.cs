@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
 
 namespace VisitorDataAccess.Repositories
@@ -45,6 +46,17 @@ namespace VisitorDataAccess.Repositories
             _dbSet.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
-
+        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId)
+        {
+            return await _dbContext.Employees
+                                   .Where(e => e.CompanyId == companyId)
+                                   .ToListAsync();
+        }
+        public async Task<Company> GetCompanyByNameAsync(string name)
+        {
+            return await _dbContext.Set<Company>()
+                                   .Where(c => c.Name.ToLower() == name.ToLower())
+                                   .FirstOrDefaultAsync();
+        }
     }
 }

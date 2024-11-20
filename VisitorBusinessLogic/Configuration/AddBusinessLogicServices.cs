@@ -10,8 +10,6 @@ namespace VisitorBusinessLogic.Configuration
         {
             // Register business logic services
             services.AddScoped<IVisitorService, VisitorService>();
-            services.AddScoped<ICompanyService, CompanyService>();
-            services.AddScoped<IEmployeeService, EmployeeService>();
 
             // Register generic services
             services.AddScoped<ICompanyServiceGeneric, CompanyServiceGeneric>();
