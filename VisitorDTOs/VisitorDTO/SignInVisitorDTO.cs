@@ -1,6 +1,4 @@
-﻿
-
-namespace VisitorDTOs
+﻿namespace VisitorDTOs.VisitorDTO
 {
     public class SignInVisitorDTO
     {
@@ -16,7 +14,7 @@ namespace VisitorDTOs
         public long AppointmentWithId { get; set; }
         public SignInVisitorDTO()
         {
-            Name = string.Empty; 
+            Name = string.Empty;
             Email = string.Empty;
         }
     }

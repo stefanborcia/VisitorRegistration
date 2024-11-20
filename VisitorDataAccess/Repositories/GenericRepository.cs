@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
+using VisitorDTOs;
 
 namespace VisitorDataAccess.Repositories
 {
@@ -57,6 +58,19 @@ namespace VisitorDataAccess.Repositories
             return await _dbContext.Set<Company>()
                                    .Where(c => c.Name.ToLower() == name.ToLower())
                                    .FirstOrDefaultAsync();
+        }
+        public async Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync()
+        {
+            return await _dbContext.Employees
+
+                .Select(e => new EmployeeWithCompanyDetailsDTO
+                {
+                    Id = e.Id,
+                    Name = e.Name,
+                    CompanyId = e.CompanyId,
+                    CompanyName = e.Company.Name
+                })
+                .ToListAsync();
         }
     }
 }

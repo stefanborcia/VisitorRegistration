@@ -1,6 +1,4 @@
-﻿
-
-namespace VisitorDTOs
+﻿namespace VisitorDTOs.VisitorDTO
 {
     public class VisitorSignInResult
     {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using VisitorBusinessLogic.Validation;
-using VisitorDTOs;
+using VisitorDTOs.VisitorDTO;
 
 namespace VisitorBusinessLogic.Configuration
 {

@@ -1,11 +1,13 @@
 ﻿@page "/visitor-sign-in"
+@using System.Text.Json
+@using VisitorDTOs.VisitorDTO
 @inject HttpClient Http
 @inject IValidator<SignInVisitorDTO> Validator
 @inject NavigationManager NavigationManager
 @using FluentValidation
 @using FluentValidation.Results
 @using System.Text.Json
-@using VisitorDTOs
+@using VisitorDTOs;
 
 <h3 class="text-center">Visitor Sign-In</h3>
 

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using VisitorDTOs;
+using VisitorDTOs.VisitorDTO;
 
 namespace VisitorBusinessLogic.Validation
 {

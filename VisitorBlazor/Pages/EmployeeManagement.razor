@@ -1,0 +1,240 @@
+﻿@page "/employee-management"
+@using System.Text.Json
+@using VisitorDTOs
+@using System.Text.Json
+@using VisitorDTOs;
+@inject HttpClient Http
+
+<h3>Employee Management</h3>
+
+<!-- Button to add a new company, positioned on the right -->
+<div class="mb-3 text-end">
+    <button class="btn btn-primary" @onclick="ShowAddEmployeeForm">Add Employee</button>
+</div>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger mt-2">
+        @ErrorMessage
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(SuccessMessage))
+{
+    <div class="alert alert-success mt-2">
+        @SuccessMessage
+    </div>
+}
+
+<!-- Form for adding a new company (appears when clicked) -->
+@if (isAddEmployeeVisible)
+{
+    <div class="mb-3">
+        <label for="employeedName" class="form-label">Employee Name</label>
+        <input type="text" id="employeedName" class="form-control" @bind="newEmployee.Name" />
+        <label>Visiting Company:</label>
+        <InputSelect @bind-Value="newEmployee.CompanyId" class="form-control">
+            <option selected>--Select Company--</option>
+            @foreach (var company in Companies)
+            {
+                <option value="@company.Id">@company.Name</option>
+            }
+        </InputSelect>
+
+        <button class="btn btn-success mt-2" @onclick="AddEmployee">Save</button>
+        <button class="btn btn-secondary mt-2 ms-2" @onclick="HideAddEmployeeForm">Cancel</button>
+    </div>
+}
+
+<!-- Form for editing a company (appears when editing) -->
+@if (editingEmployee != null)
+{
+    <div class="mb-3">
+        <label for="editCompanyName" class="form-label">Edit Employee Name</label>
+        <input type="text" id="editCompanyName" class="form-control" @bind="editingEmployee.Name" />
+        <label>Visiting Company:</label>
+        <InputSelect @bind-Value="editingEmployee.CompanyId" class="form-control">
+            <option selected>--Select Company--</option>
+            @foreach (var company in Companies)
+            {
+                <option value="@company.Id">@company.Name</option>
+            }
+        </InputSelect>
+        <button class="btn btn-success mt-2" @onclick="UpdateEmployee">Save</button>
+        <button class="btn btn-secondary mt-2 ms-2" @onclick="CancelEdit">Cancel</button>
+    </div>
+}
+
+<!-- Table for displaying companies -->
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in EmployeesWithCompany)
+        {
+            <tr>
+                <td>@employee.Id</td>
+                <td>@employee.Name</td>
+                <td>@employee.CompanyName  </td>
+                <td>
+                    <button class="btn btn-warning btn-sm" @onclick="() => EditEmployee(employee) ">Edit</button>
+                    <button class="btn btn-danger btn-sm" @onclick="() => DeleteEmployee(employee.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    private List<EmployeeDTO> Employees = new();
+    private List<EmployeeWithCompanyDetailsDTO> EmployeesWithCompany = new();
+    private EmployeeDTO newEmployee = new EmployeeDTO();
+    private List<CompanyDTO> Companies = new();
+    private EmployeeDTO editingEmployee = null;
+    private bool isAddEmployeeVisible = false; //  visibility of the Add Company form
+    private string ErrorMessage;
+    private string SuccessMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchEmployeed();
+        await FetchCompanies();
+    }
+
+    // Fetch companies from the API
+    private async Task FetchEmployeed()
+    {
+        var response = await Http.GetAsync("api/employeesWithCompanyName");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var employeeResp = await response.Content.ReadFromJsonAsync<EmployeeWithCompanyApiResponse>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            EmployeesWithCompany = employeeResp?.Values ?? new List<EmployeeWithCompanyDetailsDTO>();
+        }
+    }
+
+    private async Task FetchCompanies()
+    {
+        var response = await Http.GetAsync("api/companies");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var companyResp = await response.Content.ReadFromJsonAsync<CompanyResponse>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            Companies = companyResp?.Values ?? new List<CompanyDTO>();
+        }
+    }
+
+
+    // Add a new employee
+    private async Task AddEmployee()
+    {
+        var response = await Http.PostAsJsonAsync("api/employee/", newEmployee);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var createdEmployee = await response.Content.ReadFromJsonAsync<EmployeeDTO>();
+            Employees.Add(createdEmployee);
+            newEmployee = new EmployeeDTO();
+            isAddEmployeeVisible = false;
+            SuccessMessage = "Employee added successfully!";
+            ClearMessages();
+            await FetchEmployeed();
+        }
+        else if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            ErrorMessage = errorMessage;
+            ClearMessages();
+        }
+    }
+
+    // Show the "Add Company" form
+    private void ShowAddEmployeeForm()
+    {
+        isAddEmployeeVisible = true;
+    }
+
+    // Hide the "Add Company" form
+    private void HideAddEmployeeForm()
+    {
+        isAddEmployeeVisible = false;
+    }
+
+    // Edit a Employee
+    private async Task EditEmployee(EmployeeWithCompanyDetailsDTO employee)
+    {
+        editingEmployee = new EmployeeDTO
+            {
+                Id = employee.Id,
+                Name = employee.Name,
+                CompanyId = employee.CompanyId
+            };
+    }
+
+    // Update a company
+    private async Task UpdateEmployee()
+    {
+        if (editingEmployee != null)
+        {
+            var response = await Http.PutAsJsonAsync($"api/employee/{editingEmployee.Id}", editingEmployee);
+
+            if (response.IsSuccessStatusCode)
+            {
+                await FetchEmployeed();
+                editingEmployee = null;
+                SuccessMessage = "Company updated successfully!";
+                ClearMessages();
+            }
+        }
+    }
+
+    // Cancel editing a company
+    private void CancelEdit()
+    {
+        editingEmployee = null;
+    }
+
+    // Delete a company
+    private async Task DeleteEmployee(long employeeId)
+    {
+        var response = await Http.DeleteAsync($"api/employee/{employeeId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var employeee = EmployeesWithCompany.FirstOrDefault(c => c.Id == employeeId);
+            if (employeee != null)
+            {
+                EmployeesWithCompany.Remove(employeee);
+                SuccessMessage = "Company deleted successfully!";
+                ClearMessages();
+                await FetchEmployeed();
+            }
+        }
+    }
+
+    // Clear success and error messages after a short delay
+    private void ClearMessages()
+    {
+        Task.Delay(3000).ContinueWith(_ =>
+        {
+            SuccessMessage = string.Empty;
+            ErrorMessage = string.Empty;
+            StateHasChanged();
+        });
+    }
+}

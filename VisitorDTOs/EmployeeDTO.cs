@@ -1,6 +1,4 @@
-﻿
-
-namespace VisitorDTOs
+﻿namespace VisitorDTOs
 {
     public class EmployeeDTO
     {

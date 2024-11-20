@@ -34,6 +34,10 @@ namespace VisitorBusinessLogic.Services
                 CompanyId = e.CompanyId 
             });
         }
+        public async Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync()
+        {
+            return await _repository.GetEmployeesWithCompanyAsync();
+        }
         public async Task<IEnumerable<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId)
         {
             var employees = await _repository.GetEmployeesByCompanyIdAsync(companyId);

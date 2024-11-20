@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VisitorBusinessLogic.Exceptions;
 using VisitorBusinessLogic.Services.Interfaces;
-using VisitorDTOs;
+using VisitorDTOs.VisitorDTO;
 
 namespace VisitorAPI.Controllers
 {

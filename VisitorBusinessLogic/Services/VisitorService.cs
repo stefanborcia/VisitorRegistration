@@ -5,7 +5,7 @@ using VisitorBusinessLogic.Validation;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories;
 using VisitorDataAccess.Repositories.Interfaces;
-using VisitorDTOs;
+using VisitorDTOs.VisitorDTO;
 using Action = VisitorDataAccess.Entities.Action;
 using ValidationException = VisitorBusinessLogic.Exceptions.ValidationException;
 

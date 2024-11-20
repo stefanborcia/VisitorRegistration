@@ -2,6 +2,7 @@
 
 using System.Linq.Expressions;
 using VisitorDataAccess.Entities;
+using VisitorDTOs;
 
 namespace VisitorDataAccess.Repositories.Interfaces
 {
@@ -14,5 +15,6 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task DeleteRecordsAsync(long id);
         Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId);
         Task<Company> GetCompanyByNameAsync(string name);
+        Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync();
     }
 }

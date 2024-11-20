@@ -26,6 +26,18 @@ namespace VisitorAPI.Controllers
                 data = employees
             });
         }
+
+        [HttpGet("employeesWithCompanyName")]
+        public async Task<ActionResult<IEnumerable<EmployeeWithCompanyDetailsDTO>>> GetEmployeesWithCompanyAsync()
+        {
+
+            var employees = await _employeeService.GetEmployeesWithCompanyAsync();
+            if (employees == null)
+                return NotFound(new { message = "Employees not found." });
+
+            return Ok(employees);
+        }
+
         [HttpGet("company/{companyId}/employees")]
         public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetEmployeesByCompanyId(long companyId)
         {
@@ -50,11 +62,11 @@ namespace VisitorAPI.Controllers
         }
 
         [HttpPost("employee/")]
-       public async Task<ActionResult> AddEmployee(long companyId, [FromBody] EmployeeDTO employeeDto)
+        public async Task<ActionResult> AddEmployee(long companyId, [FromBody] EmployeeDTO employeeDto)
         {
             try
             {
-                await _employeeService.AddEmployeeAsync(companyId, employeeDto);
+                await _employeeService.AddEmployeeAsync(employeeDto.CompanyId, employeeDto);
                 return Ok(new
                 {
                     message = "Employee added successfully.",

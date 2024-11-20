@@ -1,5 +1,5 @@
 ﻿using VisitorDataAccess.Entities;
-using VisitorDTOs;
+using VisitorDTOs.VisitorDTO;
 
 namespace VisitorBusinessLogic.Services.Interfaces
 {
