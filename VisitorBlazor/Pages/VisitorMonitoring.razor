@@ -1,0 +1,55 @@
+﻿@page "/visitor-monitoring"
+@inject HttpClient Http
+@using System.Text.Json
+@using VisitorDTOs
+@using VisitorDTOs.VisitorDTO
+
+<h3>Visitor Monitoring</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Visiting Company</th>
+            <th>Appointment With</th>
+            <th>Start Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var visitors in visitorMonitoring)
+        {
+            <tr>
+                <td>@visitors.Name</td>
+                <td>@visitors.Company</td>
+                <td>@visitors.VisitingComapanyName</td>
+                <td>@visitors.AppointmentWith</td>
+                <td>@visitors.StartTime</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@code {
+    private List<VisitorMonitoringDTO> visitorMonitoring = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadVisitorMonitoring();
+    }
+
+    private async Task LoadVisitorMonitoring()
+    {
+        var response = await Http.GetAsync("api/visitor-monitoring");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var companyResp = await response.Content.ReadFromJsonAsync<VisitorMonitoringApiResponse>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                visitorMonitoring = companyResp?.Values ?? new List<VisitorMonitoringDTO>();
+        }
+    }
+}

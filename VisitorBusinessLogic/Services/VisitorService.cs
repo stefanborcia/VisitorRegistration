@@ -150,6 +150,10 @@ namespace VisitorBusinessLogic.Services
             await _visitorRepository.UpdateVisitAsync(activeVisit);
             await _visitorRepository.CreateVisitorLogAsync(visitorLog);
         }
+        public async Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync()
+        {
+            return await _visitorRepository.GetVisitorMonitoringAsync();
+        }
     }
 
 }

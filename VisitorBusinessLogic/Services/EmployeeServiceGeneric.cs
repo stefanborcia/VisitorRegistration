@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VisitorBusinessLogic.Services.Interfaces;
+﻿using VisitorBusinessLogic.Services.Interfaces;
 using VisitorDataAccess.Entities;
-using VisitorDataAccess.Repositories;
 using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDTOs;
 

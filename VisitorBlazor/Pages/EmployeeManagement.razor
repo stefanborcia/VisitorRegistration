@@ -1,8 +1,6 @@
 ﻿@page "/employee-management"
 @using System.Text.Json
 @using VisitorDTOs
-@using System.Text.Json
-@using VisitorDTOs;
 @inject HttpClient Http
 
 <h3>Employee Management</h3>
@@ -69,7 +67,7 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
+            @*<th>ID</th>*@
             <th>Name</th>
             <th>Company</th>
             <th>Actions</th>
@@ -79,7 +77,7 @@
         @foreach (var employee in EmployeesWithCompany)
         {
             <tr>
-                <td>@employee.Id</td>
+                @*<td>@employee.Id</td>*@
                 <td>@employee.Name</td>
                 <td>@employee.CompanyName  </td>
                 <td>

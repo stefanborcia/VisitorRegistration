@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
+using VisitorDTOs.VisitorDTO;
 using Action = VisitorDataAccess.Entities.Action;
 
 namespace VisitorDataAccess.Repositories
@@ -60,6 +61,21 @@ namespace VisitorDataAccess.Repositories
         {
             await _dbContext.Set<Visit>().AddAsync(visit);
             await _dbContext.SaveChangesAsync();
+        }
+        public async Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync()
+        {
+            return await _dbContext.Visits
+                .Select(e => new VisitorMonitoringDTO
+                {
+                    Id = e.Visitor.Id,
+                    Name = e.Visitor.Name,
+                    Company = e.Visitor.Company,
+                    VisitingComapanyName = e.VisitingCompany.Name,
+                    AppointmentWith = e.AppointmentWith.Name,
+                    StartTime = e.StartTime
+
+                })
+                .ToListAsync();
         }
     }
 }

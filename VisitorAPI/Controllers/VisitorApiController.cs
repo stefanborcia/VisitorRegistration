@@ -51,5 +51,15 @@ namespace VisitorAPI.Controllers
                 return StatusCode(500, new { Message = "An error occurred.", Details = ex.Message });
             }
         }
+
+        [HttpGet("visitor-monitoring")]
+        public async Task<IActionResult> GetVisitorMonitoring()
+        {
+            var visitors = await _visitorService.GetVisitorMonitoringAsync();
+            if (visitors == null)
+                return NotFound(new { message = "Visitors not found." });
+
+            return Ok(visitors);
+        }
     }
 }

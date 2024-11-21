@@ -1,4 +1,5 @@
 ﻿using VisitorDataAccess.Entities;
+using VisitorDTOs.VisitorDTO;
 
 namespace VisitorDataAccess.Repositories.Interfaces
 {
@@ -12,5 +13,7 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task CreateVisitorLogAsync(VisitorLog visitorLog);
         Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId);
         Task AddRecordsAsync(Visit visit);
+        Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync();
+
     }
 }
