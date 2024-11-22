@@ -1,4 +1,5 @@
-﻿using VisitorBusinessLogic.Services.Interfaces;
+﻿using VisitorBusinessLogic.Exceptions;
+using VisitorBusinessLogic.Services.Interfaces;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
 using VisitorDTOs;
@@ -66,16 +67,22 @@ namespace VisitorBusinessLogic.Services
             if (company == null)
                 throw new KeyNotFoundException($"Company with ID {companyId} does not exist.");
 
-            var employee = new Employee
+            var visitor = await _repository.GetVisitorByEmailAsync(employeeDto.Name);
+            if (visitor == null)
             {
-                Name = employeeDto.Name,
-                CompanyId = companyId
-            };
+                var employee = new Employee
+                {
+                    Name = employeeDto.Name,
+                    CompanyId = companyId
+                };
 
-            await _repository.AddRecordsAsync(employee);
-
-            employeeDto.Id = employee.Id;
-
+                await _repository.AddRecordsAsync(employee);
+                employeeDto.Id = employee.Id;
+            }
+            else
+            {
+                throw new DuplicateEmployeeNameException($"Employee with Name: {employeeDto.Name} already exist.");
+            }
             return employeeDto;
         }
 

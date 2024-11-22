@@ -72,5 +72,9 @@ namespace VisitorDataAccess.Repositories
                 })
                 .ToListAsync();
         }
+        public async Task<Employee> GetVisitorByEmailAsync(string name)
+        {
+            return await _dbContext.Set<Employee>().FirstOrDefaultAsync(v => v.Name == name);
+        }
     }
 }

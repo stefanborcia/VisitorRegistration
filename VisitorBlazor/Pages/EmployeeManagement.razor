@@ -99,6 +99,7 @@
     private bool isAddEmployeeVisible = false; //  visibility of the Add Company form
     private string ErrorMessage;
     private string SuccessMessage;
+    private ErrorApiResponse resposeError = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -157,6 +158,16 @@
         {
             var errorMessage = await response.Content.ReadAsStringAsync();
             ErrorMessage = errorMessage;
+            ClearMessages();
+        }
+        else
+        {
+            resposeError = await response.Content.ReadFromJsonAsync<ErrorApiResponse>(new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            ErrorMessage = resposeError.errors;
             ClearMessages();
         }
     }

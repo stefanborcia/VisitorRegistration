@@ -7,7 +7,7 @@ namespace VisitorAPI.Controllers
 {
     [Route("api/")]
     [ApiController]
-    public class VisitorApiController : ControllerBase
+    public class VisitorApiController : ControllerBase  
     {
         private readonly IVisitorService _visitorService;
 

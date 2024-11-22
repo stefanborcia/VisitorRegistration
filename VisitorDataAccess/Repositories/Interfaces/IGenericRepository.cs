@@ -16,5 +16,6 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId);
         Task<Company> GetCompanyByNameAsync(string name);
         Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync();
+        Task<Employee> GetVisitorByEmailAsync(string name);
     }
 }

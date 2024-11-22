@@ -81,7 +81,11 @@ namespace VisitorAPI.Controllers
             catch (DuplicateEmployeeNameException ex)
             {
                 // Handle the duplicate employee name exception
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { Errors = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Errors = ex.Message });
             }
         }
 
