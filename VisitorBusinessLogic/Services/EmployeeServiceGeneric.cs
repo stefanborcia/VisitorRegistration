@@ -25,7 +25,7 @@ namespace VisitorBusinessLogic.Services
             {
                 Id = e.Id,
                 Name = e.Name,
-                CompanyId = e.CompanyId 
+                CompanyId = e.CompanyId
             });
         }
         public async Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync()
@@ -54,7 +54,7 @@ namespace VisitorBusinessLogic.Services
             {
                 Id = employee.Id,
                 Name = employee.Name,
-                CompanyId = employee.CompanyId  
+                CompanyId = employee.CompanyId
             };
 
             return employeeDto;
@@ -74,7 +74,7 @@ namespace VisitorBusinessLogic.Services
 
             await _repository.AddRecordsAsync(employee);
 
-            employeeDto.Id = employee.Id;  
+            employeeDto.Id = employee.Id;
 
             return employeeDto;
         }

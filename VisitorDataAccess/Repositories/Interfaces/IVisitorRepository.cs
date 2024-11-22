@@ -1,4 +1,5 @@
 ﻿using VisitorDataAccess.Entities;
+using VisitorDTOs;
 using VisitorDTOs.VisitorDTO;
 
 namespace VisitorDataAccess.Repositories.Interfaces
@@ -14,6 +15,6 @@ namespace VisitorDataAccess.Repositories.Interfaces
         Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId);
         Task AddRecordsAsync(Visit visit);
         Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync();
-
+        Task<IEnumerable<VisitorRegistrationSearchDTO>> GetVisitorRegistrationSearchAsync(string search);
     }
 }

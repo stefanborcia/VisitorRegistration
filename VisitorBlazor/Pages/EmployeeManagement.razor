@@ -195,7 +195,7 @@
             {
                 await FetchEmployeed();
                 editingEmployee = null;
-                SuccessMessage = "Company updated successfully!";
+                SuccessMessage = "Employee updated successfully!";
                 ClearMessages();
             }
         }
@@ -218,7 +218,7 @@
             if (employeee != null)
             {
                 EmployeesWithCompany.Remove(employeee);
-                SuccessMessage = "Company deleted successfully!";
+                SuccessMessage = "Employee deleted successfully!";
                 ClearMessages();
                 await FetchEmployeed();
             }

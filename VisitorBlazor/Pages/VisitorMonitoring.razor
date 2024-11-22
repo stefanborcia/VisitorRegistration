@@ -41,7 +41,7 @@
 
     private async Task LoadVisitorMonitoring()
     {
-        var response = await Http.GetAsync("api/visitor-monitoring");
+        var response = await Http.GetAsync("api/monitoring");
 
         if (response.IsSuccessStatusCode)
         {

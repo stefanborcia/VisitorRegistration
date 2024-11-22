@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VisitorBusinessLogic.Exceptions;
 using VisitorBusinessLogic.Services.Interfaces;
 using VisitorDataAccess.Entities;
 using VisitorDTOs;
@@ -76,6 +77,11 @@ namespace VisitorAPI.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
+            }
+            catch (DuplicateEmployeeNameException ex)
+            {
+                // Handle the duplicate employee name exception
+                return BadRequest(new { message = ex.Message });
             }
         }
 

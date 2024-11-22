@@ -1,10 +1,9 @@
-﻿using FluentValidation;
-using VisitorBusinessLogic.Exceptions;
+﻿using VisitorBusinessLogic.Exceptions;
 using VisitorBusinessLogic.Services.Interfaces;
 using VisitorBusinessLogic.Validation;
 using VisitorDataAccess.Entities;
-using VisitorDataAccess.Repositories;
 using VisitorDataAccess.Repositories.Interfaces;
+using VisitorDTOs;
 using VisitorDTOs.VisitorDTO;
 using Action = VisitorDataAccess.Entities.Action;
 using ValidationException = VisitorBusinessLogic.Exceptions.ValidationException;
@@ -60,24 +59,9 @@ namespace VisitorBusinessLogic.Services
                 throw new VisitorAlreadySignedInException("Visitor is already signed in.");
             }
 
-            // Check if the employee is available for the appointment
-            await EnsureEmployeeAvailability(visitorDto.AppointmentWithId);
-
             // Create and store a new visit
             var newVisit = await CreateAndStoreVisitAsync(visitor, visitorDto);
             return newVisit;
-        }
-
-        private async Task EnsureEmployeeAvailability(long appointmentWithId)
-        {
-            // Fetch all active visits for the employee
-            var activeVisits = await _visitorRepository.GetActiveVisitsByEmployeeAsync(appointmentWithId);
-
-            // Check if any active visit conflicts with the current request
-            if (activeVisits.Any())
-            {
-                throw new Exception($"The employee with ID {appointmentWithId} is currently unavailable.");
-            }
         }
 
         private async Task<Visit> CreateAndStoreVisitAsync(Visitor visitor, SignInVisitorDTO visitorDto)
@@ -154,6 +138,9 @@ namespace VisitorBusinessLogic.Services
         {
             return await _visitorRepository.GetVisitorMonitoringAsync();
         }
+        public async Task<IEnumerable<VisitorRegistrationSearchDTO>> GetVisitorRegistrationSearchAsync(string search)
+        {
+            return await _visitorRepository.GetVisitorRegistrationSearchAsync(search);
+        }
     }
-
 }

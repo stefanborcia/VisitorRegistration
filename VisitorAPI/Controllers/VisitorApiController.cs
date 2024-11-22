@@ -52,10 +52,20 @@ namespace VisitorAPI.Controllers
             }
         }
 
-        [HttpGet("visitor-monitoring")]
+        [HttpGet("monitoring")]
         public async Task<IActionResult> GetVisitorMonitoring()
         {
             var visitors = await _visitorService.GetVisitorMonitoringAsync();
+            if (visitors == null)
+                return NotFound(new { message = "Visitors not found." });
+
+            return Ok(visitors);
+        }
+
+        [HttpGet("registration-search/{search}")]
+        public async Task<IActionResult> GetVisitorRegistrationSearch(string search)
+        {
+            var visitors = await _visitorService.GetVisitorRegistrationSearchAsync(search);
             if (visitors == null)
                 return NotFound(new { message = "Visitors not found." });
 

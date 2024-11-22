@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
+using VisitorDTOs;
 using VisitorDTOs.VisitorDTO;
 using Action = VisitorDataAccess.Entities.Action;
 
@@ -76,6 +77,33 @@ namespace VisitorDataAccess.Repositories
 
                 })
                 .ToListAsync();
+        }
+        public async Task<IEnumerable<VisitorRegistrationSearchDTO>> GetVisitorRegistrationSearchAsync(string search)
+        {
+            return await _dbContext.Visits
+                .Where(e => e.Visitor.Id.ToString().Contains(search) 
+                            || e.Visitor.Name.ToLower().Contains(search.ToLower()) 
+                            || e.Visitor.Email.ToLower().Contains(search.ToLower()) 
+                            || e.Visitor.Company.ToLower().Contains(search.ToLower()) 
+                            || e.VisitingCompany.Name.ToLower().Contains(search.ToLower()) 
+                            || e.AppointmentWith.Name.ToLower().Contains(search.ToLower()))
+
+                //TODO implement search on date
+
+                .Select(e => new VisitorRegistrationSearchDTO
+                {
+                    Id = e.Visitor.Id,
+                    Name = e.Visitor.Name,
+                    Email = e.Visitor.Email,
+                    Company = e.Visitor.Company,
+                    VisitingComapanyName = e.VisitingCompany.Name,
+                    AppointmentWithEmployeeName = e.AppointmentWith.Name,
+                    TimeSpent = e.EndTime.HasValue
+                        ? (e.EndTime.Value - e.StartTime).ToString(@"hh\:mm\:ss")
+                        : "In Progress",
+                    StartTime = e.StartTime,
+                })
+                .ToListAsync(); 
         }
     }
 }

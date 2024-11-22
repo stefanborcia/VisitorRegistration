@@ -1,5 +1,7 @@
 ﻿
 
+using System.ComponentModel.DataAnnotations;
+
 namespace VisitorDataAccess.Entities
 {
     public class Company : SoftDelete
