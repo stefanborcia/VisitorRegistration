@@ -30,7 +30,7 @@ namespace VisitorAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "An error occurred.", Details = ex.Message });
+                return BadRequest( new { Errors = ex.Message });
             }
         }
 

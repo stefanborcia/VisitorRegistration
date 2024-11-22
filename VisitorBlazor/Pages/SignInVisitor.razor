@@ -99,6 +99,7 @@
     private Dictionary<string, string> ValidationErrors = new();
     private string? SuccessMessage;
     private string? ErrorMessage;
+    private SiginErrorApiResponse resposeError = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -168,7 +169,11 @@
             else
             {
                 // Display the error message received from the API
-                ErrorMessage = await response.Content.ReadAsStringAsync();
+                resposeError = await response.Content.ReadFromJsonAsync<SiginErrorApiResponse>(new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                ErrorMessage = resposeError.errors;
                 StateHasChanged();
             }
         }
