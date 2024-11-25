@@ -1,7 +1,8 @@
-﻿@page "/company-management"
+﻿@page "/admin/company-management"
 @using System.Text.Json
 @using VisitorDTOs
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime
 
 <h3>Company Management</h3>
 
@@ -167,18 +168,26 @@ if (editingCompany != null)
     // Delete a company
     private async Task DeleteCompany(long companyId)
     {
-        var response = await Http.DeleteAsync($"api/company/{companyId}");
-
-        if (response.IsSuccessStatusCode)
+        if (await ConfirmDelete())
         {
-            var company = Companies.FirstOrDefault(c => c.Id == companyId);
-            if (company != null)
+            var response = await Http.DeleteAsync($"api/company/{companyId}");
+
+            if (response.IsSuccessStatusCode)
             {
-                Companies.Remove(company);
-                SuccessMessage = "Company deleted successfully!";
-                ClearMessages();
+                var company = Companies.FirstOrDefault(c => c.Id == companyId);
+                if (company != null)
+                {
+                    Companies.Remove(company);
+                    SuccessMessage = "Company deleted successfully!";
+                    ClearMessages();
+                    await FetchCompanies();
+                }
             }
         }
+    }
+    private async Task<bool> ConfirmDelete()
+    {
+        return await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this company?");
     }
 
     // Clear success and error messages after a short delay

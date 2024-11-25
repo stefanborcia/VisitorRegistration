@@ -14,7 +14,7 @@
     <div class="col-md-8">
 
         <EditForm Model="Visitor" OnValidSubmit="HandleValidSubmit">
-            <ValidationSummary />
+            <ValidationSummary Model="Visitor" ExcludePropertyExpressions="new[] { nameof(Visitor.VisitingCompanyId), nameof(Visitor.AppointmentWithId) }" />
 
             <!-- Row for Name and Email -->
             <div class="row mb-3">
@@ -64,9 +64,16 @@
                     <label>Appointment With:</label>
                     <InputSelect @bind-Value="Visitor.AppointmentWithId" class="form-control">
                         <option value="">--Select Employee--</option>
-                        @foreach (var employee in AppointmentOptions)
+                        @if (AppointmentOptions.Any())
                         {
-                            <option value="@employee.Id">@employee.Name</option>
+                            @foreach (var employee in AppointmentOptions)
+                            {
+                                <option value="@employee.Id">@employee.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            <option disabled>No employees available</option>
                         }
                     </InputSelect>
                     @if (ValidationErrors.ContainsKey(nameof(Visitor.AppointmentWithId)))
@@ -123,11 +130,40 @@
 
     private async Task OnVisitingCompanyChanged(ChangeEventArgs e)
     {
+        AppointmentOptions.Clear(); // Reset the employee list on company change
+
         if (long.TryParse(e.Value?.ToString(), out var companyId) && companyId > 0)
         {
             Visitor.VisitingCompanyId = companyId;
-            var response = await Http.GetFromJsonAsync<EmployeeApiResponse>($"api/company/{companyId}/employees");
-            AppointmentOptions = response?.Values ?? new List<EmployeeDTO>();
+
+            try
+            {
+                var response = await Http.GetAsync($"api/company/{companyId}/employees");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var employeeResponse = await response.Content.ReadFromJsonAsync<EmployeeApiResponse>();
+                    AppointmentOptions = employeeResponse?.Values ?? new List<EmployeeDTO>();
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    AppointmentOptions = new List<EmployeeDTO>(); // No employees for the company
+                }
+                else
+                {
+                    ErrorMessage = "Unable to fetch employees for the selected company.";
+                    StateHasChanged();
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = "An error occurred while fetching employees.";
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            Visitor.VisitingCompanyId = 0; // Assign null when no valid company is selected
         }
     }
 

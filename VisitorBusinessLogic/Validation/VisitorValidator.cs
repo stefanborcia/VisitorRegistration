@@ -20,6 +20,7 @@ namespace VisitorBusinessLogic.Validation
 
             RuleFor(visitor => visitor.AppointmentWithId)
                 .GreaterThan(0).WithMessage("A valid appointment with an employee is required.");
+
         }
     }
 }

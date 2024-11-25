@@ -4,17 +4,14 @@ using VisitorDTOs.VisitorDTO;
 
 namespace VisitorDataAccess.Repositories.Interfaces
 {
-    public interface IVisitorRepository
+    public interface IVisitorRepository : IGenericRepository<Visitor>
     {
-        Task AddVisitorAsync(Visitor visitor);          
-        Task<Visitor> GetVisitorByEmailAsync(string email); 
-        Task<Visit> GetActiveVisitByVisitorAsync(long visitorId);
-        Task UpdateVisitAsync(Visit activeVisit);
-        Task CreateVisitAsync(Visit newVisit);
-        Task CreateVisitorLogAsync(VisitorLog visitorLog);
-        Task<IEnumerable<Visit>> GetActiveVisitsByEmployeeAsync(long employeeId);
-        Task AddRecordsAsync(Visit visit);
+        Task<Visitor?> GetVisitorByEmailAsync(string email);
+        Task<Visit?> GetActiveVisitByVisitorAsync(long visitorId);
         Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync();
         Task<IEnumerable<VisitorRegistrationSearchDTO>> GetVisitorRegistrationSearchAsync(string search);
+        Task<Visit> AddVisitAsync(Visitor visitor);
+        Task CreateLogAsync(VisitorLog visitorLog);
+        Task UpdateAsync(Visit activeVisit);
     }
 }

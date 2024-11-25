@@ -1,80 +1,72 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
-using VisitorDTOs;
 
 namespace VisitorDataAccess.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    // Generic Repository handling basic CRUD operations for any entity
+    public class GenericRepository<T> : IGenericRepository<T> where T : SoftDelete
     {
         private readonly VisitorDbContext _dbContext;
         private readonly DbSet<T> _dbSet;
 
+        // Constructor initializes the dbContext and DbSet
         public GenericRepository(VisitorDbContext context)
         {
             _dbContext = context;
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAllRecordsAsync()
+        // Get all entities of type T
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.Where(e => !e.IsDeleted).ToListAsync();
         }
 
-        public async Task<T> GetRecordsByIdAsync(long id)
+        // Get a single entity by its ID
+        public async Task<T> GetByIdAsync(long id)
         {
-            return await _dbSet.FindAsync(id);
+            //EF.Property - properties not explicitly defined in the entity class but configured in the EF model
+            return await _dbSet.Where(e => !e.IsDeleted).FirstOrDefaultAsync(e => EF.Property<long>(e, "Id") == id); 
         }
 
-        public async Task AddRecordsAsync(T entity)
+        // Add a new entity to the context
+        public async Task AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task DeleteRecordsAsync(long id)
-        {
-            var entity = await GetRecordsByIdAsync(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-
-        public async Task UpdateRecordsAsync(T entity)
+        // Update an existing entity in the context
+        public async Task UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _dbContext.SaveChangesAsync();
         }
-        public async Task<IEnumerable<Employee>> GetEmployeesByCompanyIdAsync(long companyId)
-        {
-            return await _dbContext.Employees
-                                   .Where(e => e.CompanyId == companyId)
-                                   .ToListAsync();
-        }
-        public async Task<Company> GetCompanyByNameAsync(string name)
-        {
-            return await _dbContext.Set<Company>()
-                                   .Where(c => c.Name.ToLower() == name.ToLower())
-                                   .FirstOrDefaultAsync();
-        }
-        public async Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync()
-        {
-            return await _dbContext.Employees
 
-                .Select(e => new EmployeeWithCompanyDetailsDTO
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    CompanyId = e.CompanyId,
-                    CompanyName = e.Company.Name
-                })
-                .ToListAsync();
-        }
-        public async Task<Employee> GetVisitorByEmailAsync(string name)
+        // Delete an entity by its ID
+        public async Task DeleteAsync(long id)
         {
-            return await _dbContext.Set<Employee>().FirstOrDefaultAsync(v => v.Name == name);
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                _dbSet.Remove(entity); 
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+
+        // Soft delete an entity (set IsDeleted to true)
+        public async Task SoftDeleteAsync(long id)
+        {
+            var entity = await GetByIdAsync(id);
+            if (entity != null)
+            {
+                entity.IsDeleted = true; // Mark as deleted
+                _dbSet.Update(entity);
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 }

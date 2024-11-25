@@ -1,11 +1,12 @@
-﻿@page "/employee-management"
+﻿@page "/admin/employee-management"
 @using System.Text.Json
 @using VisitorDTOs
 @inject HttpClient Http
+@inject IJSRuntime JsRuntime
 
 <h3>Employee Management</h3>
 
-<!-- Button to add a new company, positioned on the right -->
+<!-- Button to add a new employee, positioned on the right -->
 <div class="mb-3 text-end">
     <button class="btn btn-primary" @onclick="ShowAddEmployeeForm">Add Employee</button>
 </div>
@@ -24,7 +25,7 @@
     </div>
 }
 
-<!-- Form for adding a new company (appears when clicked) -->
+<!-- Form for adding a new employee (appears when clicked) -->
 @if (isAddEmployeeVisible)
 {
     <div class="mb-3">
@@ -44,7 +45,7 @@
     </div>
 }
 
-<!-- Form for editing a company (appears when editing) -->
+<!-- Form for editing a employee (appears when editing) -->
 @if (editingEmployee != null)
 {
     <div class="mb-3">
@@ -63,7 +64,7 @@
     </div>
 }
 
-<!-- Table for displaying companies -->
+<!-- Table for displaying employees -->
 <table class="table table-striped">
     <thead>
         <tr>
@@ -97,8 +98,8 @@
     private List<CompanyDTO> Companies = new();
     private EmployeeDTO editingEmployee = null;
     private bool isAddEmployeeVisible = false; //  visibility of the Add Company form
-    private string ErrorMessage;
-    private string SuccessMessage;
+    private string? ErrorMessage;
+    private string? SuccessMessage;
     private ErrorApiResponse resposeError = new();
 
     protected override async Task OnInitializedAsync()
@@ -147,7 +148,10 @@
         if (response.IsSuccessStatusCode)
         {
             var createdEmployee = await response.Content.ReadFromJsonAsync<EmployeeDTO>();
-            Employees.Add(createdEmployee);
+            if (createdEmployee != null)
+            {
+                Employees.Add(createdEmployee);
+            }
             newEmployee = new EmployeeDTO();
             isAddEmployeeVisible = false;
             SuccessMessage = "Employee added successfully!";
@@ -172,13 +176,13 @@
         }
     }
 
-    // Show the "Add Company" form
+    // Show the "Add employee" form
     private void ShowAddEmployeeForm()
     {
         isAddEmployeeVisible = true;
     }
 
-    // Hide the "Add Company" form
+    // Hide the "Add employee" form
     private void HideAddEmployeeForm()
     {
         isAddEmployeeVisible = false;
@@ -195,7 +199,7 @@
             };
     }
 
-    // Update a company
+    // Update a employee
     private async Task UpdateEmployee()
     {
         if (editingEmployee != null)
@@ -212,28 +216,40 @@
         }
     }
 
-    // Cancel editing a company
+    // Cancel editing a employee
     private void CancelEdit()
     {
         editingEmployee = null;
     }
 
-    // Delete a company
+    // Delete a employee
     private async Task DeleteEmployee(long employeeId)
     {
+        // Confirmation prompt logic
+        if (!await ConfirmDelete())
+        {
+            return; 
+        }
+
         var response = await Http.DeleteAsync($"api/employee/{employeeId}");
 
         if (response.IsSuccessStatusCode)
         {
-            var employeee = EmployeesWithCompany.FirstOrDefault(c => c.Id == employeeId);
-            if (employeee != null)
+            var employee = EmployeesWithCompany.FirstOrDefault(c => c.Id == employeeId);
+            if (employee != null)
             {
-                EmployeesWithCompany.Remove(employeee);
+                EmployeesWithCompany.Remove(employee);
                 SuccessMessage = "Employee deleted successfully!";
                 ClearMessages();
                 await FetchEmployeed();
             }
         }
+    }
+    private async Task<bool> ConfirmDelete()
+    {
+        // Display confirmation message using Blazor
+        var confirmDelete = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this employee?");
+        return confirmDelete;
     }
 
     // Clear success and error messages after a short delay

@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject NavigationManager NavigationManager
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">VisitorBlazor</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -9,31 +11,30 @@
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu fs-5" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/company-management" Match="NavLinkMatch.All">
-                <span class="bi bi-building-fill fs-5 mb-4" aria-hidden="true"></span> Company Management
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/employee-management" Match="NavLinkMatch.All">
-                <span class="bi bi-person-fill fs-5 mb-4 p-0" aria-hidden="true"></span> Employee Management 
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/visitor-monitoring" Match="NavLinkMatch.All">
-                <span class="bi bi-eye fs-5 mb-4" aria-hidden="true"></span> Visitor Monitoring 
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="/visitor-registration-search" Match="NavLinkMatch.All">
-                <span class="bi bi-search fs-5 mb-4" aria-hidden="true"></span> Registration Search
-            </NavLink>
-        </div>
+
+        @if (isAdminSection)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/company-management" Match="NavLinkMatch.All">
+                    <span class="bi bi-building-fill fs-5 mb-4" aria-hidden="true"></span> Company Management
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/employee-management" Match="NavLinkMatch.All">
+                    <span class="bi bi-person-fill fs-5 mb-4 p-0" aria-hidden="true"></span> Employee Management
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/visitor-monitoring" Match="NavLinkMatch.All">
+                    <span class="bi bi-eye fs-5 mb-4" aria-hidden="true"></span> Visitor Monitoring
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/visitor-registration-search" Match="NavLinkMatch.All">
+                    <span class="bi bi-search fs-5 mb-4" aria-hidden="true"></span> Registration Search
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
@@ -45,5 +46,32 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private bool isAdminSection;
+    protected override void OnInitialized()
+    {
+        // Subscribe to navigation changes
+        NavigationManager.LocationChanged += OnLocationChanged;
+        UpdateMenu(NavigationManager.Uri);
+    }
+
+    private void UpdateMenu(string uri)
+    {
+        // Check if the current URL is part of the admin section
+        isAdminSection = uri.Contains("/admin");
+        StateHasChanged(); // Force UI update
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        // Update menu on navigation
+        UpdateMenu(e.Location);
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }

@@ -8,104 +8,89 @@ namespace VisitorBusinessLogic.Services
 {
     public class EmployeeServiceGeneric : IEmployeeServiceGeneric
     {
-        private readonly IGenericRepository<Employee> _repository;
-        private readonly IGenericRepository<Company> _companyRepository;
+        private readonly IEmployeeRepository _repository;
 
-        public EmployeeServiceGeneric(
-            IGenericRepository<Employee> repository,
-            IGenericRepository<Company> companyRepository)
+        public EmployeeServiceGeneric(IEmployeeRepository repository)
         {
             _repository = repository;
-            _companyRepository = companyRepository;
         }
 
         public async Task<IEnumerable<EmployeeDTO>> GetEmployeesAsync()
         {
-            var employees = await _repository.GetAllRecordsAsync();
-            return employees.Select(e => new EmployeeDTO
-            {
-                Id = e.Id,
-                Name = e.Name,
-                CompanyId = e.CompanyId
-            });
+            var employees = await _repository.GetAllAsync();
+            return employees.Select(e => new EmployeeDTO { Id = e.Id, Name = e.Name, CompanyId = e.CompanyId });
         }
+
         public async Task<IEnumerable<EmployeeWithCompanyDetailsDTO>> GetEmployeesWithCompanyAsync()
         {
             return await _repository.GetEmployeesWithCompanyAsync();
         }
+
         public async Task<IEnumerable<EmployeeDTO>> GetEmployeesByCompanyIdAsync(long companyId)
         {
             var employees = await _repository.GetEmployeesByCompanyIdAsync(companyId);
-            return employees.Select(e => new EmployeeDTO
-            {
-                Id = e.Id,
-                Name = e.Name,
-                CompanyId = e.CompanyId
-            });
+            return employees.Select(e => new EmployeeDTO { Id = e.Id, Name = e.Name, CompanyId = e.CompanyId });
         }
 
-        public async Task<EmployeeDTO> GetEmployeeByIdAsync(long id)
+        public async Task<EmployeeDTO?> GetEmployeeByIdAsync(long id)
         {
-            var employee = await _repository.GetRecordsByIdAsync(id);
-
-            if (employee == null)
-                return null;
-
-            var employeeDto = new EmployeeDTO
-            {
-                Id = employee.Id,
-                Name = employee.Name,
-                CompanyId = employee.CompanyId
-            };
-
-            return employeeDto;
+            var employee = await _repository.GetByIdAsync(id);
+            return employee == null ? null : new EmployeeDTO { Id = employee.Id, Name = employee.Name, CompanyId = employee.CompanyId };
         }
 
         public async Task<EmployeeDTO> AddEmployeeAsync(long companyId, EmployeeDTO employeeDto)
         {
-            var company = await _companyRepository.GetRecordsByIdAsync(companyId);
-            if (company == null)
-                throw new KeyNotFoundException($"Company with ID {companyId} does not exist.");
+            // Await the result of GetAllAsync
+            var employees = await _repository.GetAllAsync();
 
-            var visitor = await _repository.GetVisitorByEmailAsync(employeeDto.Name);
-            if (visitor == null)
-            {
-                var employee = new Employee
-                {
-                    Name = employeeDto.Name,
-                    CompanyId = companyId
-                };
+            // Check if an employee with the same name exists for the given company
+            var existingEmployee = employees.FirstOrDefault(e => e.Name == employeeDto.Name);
 
-                await _repository.AddRecordsAsync(employee);
-                employeeDto.Id = employee.Id;
-            }
-            else
+            if (existingEmployee != null)
             {
-                throw new DuplicateEmployeeNameException($"Employee with Name: {employeeDto.Name} already exist.");
+                // Throw the exception if a duplicate is found
+                throw new DuplicateEmployeeNameException($"Employee with name: {employeeDto.Name} already exists.");
             }
-            return employeeDto;
+
+            //add the employee if no duplicate is found
+            var employee = new Employee
+            {
+                Name = employeeDto.Name,
+                CompanyId = companyId
+            };
+
+            await _repository.AddAsync(employee);
+
+            // Return the created EmployeeDTO
+            return new EmployeeDTO { Id = employee.Id, Name = employee.Name, CompanyId = employee.CompanyId };
         }
 
 
         public async Task UpdateEmployeeAsync(EmployeeDTO employeeDto)
         {
-            var company = await _companyRepository.GetRecordsByIdAsync(employeeDto.CompanyId);
-            if (company == null)
-                throw new KeyNotFoundException($"Company with ID {employeeDto.CompanyId} does not exist.");
-
-            var employee = new Employee
+            var existingEmployee = await _repository.GetByIdAsync(employeeDto.Id);
+            if (existingEmployee == null)
             {
-                Id = employeeDto.Id,
-                Name = employeeDto.Name,
-                CompanyId = employeeDto.CompanyId
-            };
+                throw new KeyNotFoundException($"Employee with ID {employeeDto.Id} does not exist.");
+            }
 
-            await _repository.UpdateRecordsAsync(employee);
+            existingEmployee.Name = employeeDto.Name;
+            existingEmployee.CompanyId = employeeDto.CompanyId;
+
+            await _repository.UpdateAsync(existingEmployee);
         }
 
         public async Task DeleteEmployeeAsync(long id)
         {
-            await _repository.DeleteRecordsAsync(id);
+            // Check if the company exists
+            var company = await _repository.GetByIdAsync(id);
+            if (company == null)
+            {
+                throw new KeyNotFoundException($"Company with ID {id} does not exist.");
+            }
+
+            // Implement the soft delete
+            await _repository.SoftDeleteAsync(id);
         }
     }
 }
