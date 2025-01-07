@@ -4,8 +4,14 @@
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime
 
-<h3>Company Management</h3>
+<div style="min-height: 100vh; display: flex; flex-direction: column;padding:150px; background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1); color: white;">
 
+<h3 class="text-center">Company Management</h3>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <NavLink class="btn btn-admin-panel" href="/admin">
+            Admin Panel
+        </NavLink>
+    </div>
 <!-- Button to add a new company, positioned on the right -->
 <div class="mb-3 text-end">
     <button class="btn btn-primary" @onclick="ShowAddCompanyForm">Add Company</button>
@@ -52,15 +58,15 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Actions</th>
+                <th style="text-align: right;padding-right:30px;">Actions</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var company in Companies)
         {
             <tr>
-                <td>@company.Name</td>
-                <td>
+                <td class="text-white">@company.Name</td>
+                <td style="text-align: right;">
                     <button class="btn btn-warning btn-sm" @onclick="() => EditCompany(company)">Edit</button>
                     <button class="btn btn-danger btn-sm" @onclick="() => DeleteCompany(company.Id)">Delete</button>
                 </td>
@@ -68,7 +74,7 @@
         }
     </tbody>
 </table>
-
+</div>
 @code {
     private List<CompanyDTO> Companies = new();
     private CompanyDTO newCompany = new CompanyDTO();

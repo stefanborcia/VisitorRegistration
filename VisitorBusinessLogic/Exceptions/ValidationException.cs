@@ -6,7 +6,7 @@ namespace VisitorBusinessLogic.Exceptions
     {
         public List<string> ValidationErrors { get; }
 
-        public ValidationException(List<string> validationErrors)
+        public ValidationException(List<string> validationErrors) : base(string.Join("; ", validationErrors))
         {
             ValidationErrors = validationErrors;
         }

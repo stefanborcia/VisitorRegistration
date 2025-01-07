@@ -1,13 +1,35 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
     <main>
-        <article class="content px-4">
             @Body
-        </article>
     </main>
 </div>
+
+@code {
+    private bool showSidebar = true;
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        UpdateSidebar(NavigationManager.Uri);
+    }
+
+    private void UpdateSidebar(string uri)
+    {
+        // Hide the sidebar on the home page
+        showSidebar = !uri.EndsWith("/");
+        StateHasChanged(); // Trigger UI update
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateSidebar(e.Location);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

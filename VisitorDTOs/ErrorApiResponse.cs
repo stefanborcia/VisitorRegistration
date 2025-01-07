@@ -10,6 +10,6 @@ namespace VisitorDTOs
     public class ErrorApiResponse
     {
         [JsonPropertyName("errors")]
-        public string errors { get; set; }
+        public string? errors { get; set; }
     }
 }

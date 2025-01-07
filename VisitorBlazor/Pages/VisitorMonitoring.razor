@@ -3,9 +3,13 @@
 @using System.Text.Json
 @using VisitorDTOs
 @using VisitorDTOs.VisitorDTO
-
-<h3>Visitor Monitoring</h3>
-
+<div style="min-height: 100vh; display: flex; flex-direction: column;padding:150px; background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1); color: white;">
+<h3 class="text-center pb-3">Visitor Monitoring</h3>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <NavLink class="btn btn-admin-panel" href="/admin">
+            Admin Panel
+        </NavLink>
+    </div>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -19,7 +23,7 @@
     <tbody>
         @foreach (var visitors in visitorMonitoring)
         {
-            <tr>
+            <tr class="text-white">
                 <td>@visitors.Name</td>
                 <td>@visitors.Company</td>
                 <td>@visitors.VisitingComapanyName</td>
@@ -29,8 +33,7 @@
         }
     </tbody>
 </table>
-
-
+</div>
 @code {
     private List<VisitorMonitoringDTO> visitorMonitoring = new();
 

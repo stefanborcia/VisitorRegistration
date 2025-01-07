@@ -1,10 +1,46 @@
 ﻿@page "/admin"
+<div style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1); color: white;">
+<h3 class="text-center pb-5">Welcome to the Admin Dashboard!</h3>
+<div style="display: flex; align-content: center; flex-direction: column;">
 
-<div style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column;">
-    <h3>Welcome to the Admin Dashboard!</h3>
+    <!-- Navigation Menu -->
+    <div>
+        <nav class="d-flex justify-content-around">
+            @if (isAdminSection)
+            {
+                    <!-- Company Management Button -->
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link btn btn-company w-100 text-start" href="/admin/company-management" Match="NavLinkMatch.All">
+                            <span class="bi bi-diagram-3-fill fs-1 mb-4" aria-hidden="true"></span> Company Management
+                        </NavLink>
+                    </div>
 
+                    <!-- Employee Management Button -->
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link btn btn-employee w-100 text-start" href="/admin/employee-management" Match="NavLinkMatch.All">
+                            <span class="bi bi-people-fill fs-1 mb-4" aria-hidden="true"></span> Employee Management
+                        </NavLink>
+                    </div>
+
+                    <!-- Visitor Monitoring Button -->
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link btn btn-visitor w-100 text-start" href="/admin/visitor-monitoring" Match="NavLinkMatch.All">
+                            <span class="bi bi-camera-video-fill fs-1 mb-4" aria-hidden="true"></span> Visitor Monitoring
+                        </NavLink>
+                    </div>
+
+                    <!-- Registration Search Button -->
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link btn btn-registration w-100 text-start" href="/admin/visitor-registration-search" Match="NavLinkMatch.All">
+                            <span class="bi bi-clipboard-data-fill fs-1 mb-4" aria-hidden="true"></span> Registration Search
+                        </NavLink>
+                    </div>
+
+            }
+        </nav>
+    </div>
 </div>
-
+</div>
 @code {
-
+    private bool isAdminSection = true;  // Set this to true if the admin section is active.
 }

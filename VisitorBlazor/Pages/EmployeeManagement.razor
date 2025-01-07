@@ -3,9 +3,13 @@
 @using VisitorDTOs
 @inject HttpClient Http
 @inject IJSRuntime JsRuntime
-
-<h3>Employee Management</h3>
-
+<div style="min-height: 100vh; display: flex; flex-direction: column;padding:150px; background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1); color: white;">
+<h3 class="text-center">Employee Management</h3>
+    <div style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <NavLink class="btn btn-admin-panel" href="/admin">
+            Admin Panel
+        </NavLink>
+    </div>
 <!-- Button to add a new employee, positioned on the right -->
 <div class="mb-3 text-end">
     <button class="btn btn-primary" @onclick="ShowAddEmployeeForm">Add Employee</button>
@@ -71,7 +75,7 @@
             @*<th>ID</th>*@
             <th>Name</th>
             <th>Company</th>
-            <th>Actions</th>
+            <th style="text-align: right;padding-right:30px;">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -79,9 +83,9 @@
         {
             <tr>
                 @*<td>@employee.Id</td>*@
-                <td>@employee.Name</td>
-                <td>@employee.CompanyName  </td>
-                <td>
+                <td class="text-white">@employee.Name</td>
+                <td class="text-white">@employee.CompanyName  </td>
+                <td style="text-align: right;">
                     <button class="btn btn-warning btn-sm" @onclick="() => EditEmployee(employee) ">Edit</button>
                     <button class="btn btn-danger btn-sm" @onclick="() => DeleteEmployee(employee.Id)">Delete</button>
                 </td>
@@ -89,7 +93,7 @@
         }
     </tbody>
 </table>
-
+</div>
 @code {
 
     private List<EmployeeDTO> Employees = new();

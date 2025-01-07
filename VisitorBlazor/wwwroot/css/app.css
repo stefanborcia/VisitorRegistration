@@ -1,5 +1,8 @@
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body, html, main {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
 }
 
 h1:focus {
@@ -123,4 +126,122 @@ code {
     max-width: 90%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.home-container {
+    background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1);
+    color: #ffffff; /* White text for contrast */
+    min-height:100vh;
+    text-align: center;
+}
 
+    .home-container h3 {
+        padding:150px 0px;
+        font-size: 2.5rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+.home-buttons {
+    padding-top:30px;
+    display: flex;
+    justify-content:center;
+    gap: 20px;
+}
+
+    .home-buttons button {
+        padding: 15px 30px;
+        font-size: 1.2rem;
+        border-radius: 8px;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+        .home-buttons button:hover {
+            transform: scale(1.1);
+        }
+
+.btn-success {
+    background-color: #388e3c;
+    border-color: #388e3c;
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #d32f2f;
+    border-color: #d32f2f;
+    color: #fff;
+}
+
+.btn-success:hover {
+    background-color: #2e7d32;
+    border-color: #2e7d32;
+}
+
+.btn-danger:hover {
+    background-color: #c62828;
+    border-color: #c62828;
+}
+img{
+    width: 500px;
+    height:300px;
+}
+/* Company Management Button */
+.btn-company {
+    background-color: #0056b3; /* Blue background */
+    color: white; /* White text */
+    border: none;
+}
+
+    .btn-company:hover {
+        background-color: #007bff; /* Darker blue on hover */
+    }
+
+/* Employee Management Button */
+.btn-employee {
+    background-color:#1e7e34; /* Green background */
+    color: white;
+    border: none;
+}
+
+    .btn-employee:hover {
+        background-color: #28a745; /* Darker green on hover */
+    }
+
+/* Visitor Monitoring Button */
+.btn-visitor {
+    background-color: #ffc107;
+     /* Yellow background */
+    color: black; /* Black text for contrast */
+    border: none;
+}
+
+    .btn-visitor:hover {
+        background-color: #e0a800; /* Darker yellow on hover */
+    }
+
+/* Registration Search Button */
+.btn-registration {
+    background-color: #dc3545; /* Red background */
+    color: white;
+    border: none;
+}
+
+    .btn-registration:hover {
+        background-color: #b21f2d; /* Darker red on hover */
+    }
+.btn-admin-panel {
+    background-color: #6610f2; /* Purple background */
+    color: white; /* White text */
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+    .btn-admin-panel:hover {
+        background-color: #5a0ec1; /* Darker purple on hover */
+        color: #f8f9fa; /* Light text */
+        transform: scale(1.1); /* Slightly enlarge on hover */
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }

@@ -33,6 +33,7 @@ namespace VisitorDataAccess.Repositories
         public async Task<IEnumerable<VisitorMonitoringDTO>> GetVisitorMonitoringAsync()
         {
             return await _dbContext.Visits
+                .Where(v => v.EndTime == null) //Only visitors who are signedIn
                 .Select(e => new VisitorMonitoringDTO
                 {
                     Id = e.Visitor.Id,

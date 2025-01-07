@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using VisitorDataAccess.Entities;
 using VisitorDataAccess.Repositories.Interfaces;
 

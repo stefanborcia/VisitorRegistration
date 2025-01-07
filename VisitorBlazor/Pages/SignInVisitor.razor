@@ -8,82 +8,81 @@
 @using FluentValidation.Results
 @using VisitorDTOs;
 
-<h3 class="text-center">Visitor Sign-In</h3>
+<div style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(to bottom, #6610f2, #8b5cf6, #6f42c1); color: white;">
+    <button @onclick="NavigateToHome" class="btn btn-light" style="position: absolute; top: 20px; right: 20px; font-weight: bold;">Home</button>
 
-<div class="d-flex justify-content-center align-items-center">
-    <div class="col-md-8">
+    <h3 class="text-center mb-4" style="font-weight: bold;">Visitor Sign-In</h3>
 
+    <div class="p-4 rounded" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 10px; width: 100%; max-width: 400px;">
         <EditForm Model="Visitor" OnValidSubmit="HandleValidSubmit">
             <ValidationSummary Model="Visitor" ExcludePropertyExpressions="new[] { nameof(Visitor.VisitingCompanyId), nameof(Visitor.AppointmentWithId) }" />
 
             <!-- Row for Name and Email -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label>Name:</label>
-                    <InputText @bind-Value="Visitor.Name" class="form-control" />
-                    @if (ValidationErrors.ContainsKey(nameof(Visitor.Name)))
-                    {
-                        <span class="text-danger">@ValidationErrors[nameof(Visitor.Name)]</span>
-                    }
-                </div>
-                <div class="col-md-6">
-                    <label>Email:</label>
-                    <InputText @bind-Value="Visitor.Email" type="email" class="form-control" />
-                    @if (ValidationErrors.ContainsKey(nameof(Visitor.Email)))
-                    {
-                        <span class="text-danger">@ValidationErrors[nameof(Visitor.Email)]</span>
-                    }
-                </div>
+            <div class="mb-3">
+                <label>Name:</label>
+                <InputText @bind-Value="Visitor.Name" class="form-control" />
+                @if (ValidationErrors.ContainsKey(nameof(Visitor.Name)))
+                {
+                    <span class="text-danger">@ValidationErrors[nameof(Visitor.Name)]</span>
+                }
             </div>
 
-            <!-- Row for Company (Centered and full-width in this form section) -->
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <label>Company:</label>
-                    <InputText @bind-Value="Visitor.Company" class="form-control" placeholder="Optional" />
-                </div>
+            <div class="mb-3">
+                <label>Email:</label>
+                <InputText @bind-Value="Visitor.Email" type="email" class="form-control" />
+                @if (ValidationErrors.ContainsKey(nameof(Visitor.Email)))
+                {
+                    <span class="text-danger">@ValidationErrors[nameof(Visitor.Email)]</span>
+                }
             </div>
 
-            <!-- Row for Visiting Company and Appointment With -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label>Visiting Company:</label>
-                    <InputSelect @bind-Value="Visitor.VisitingCompanyId" class="form-control" @oninput="OnVisitingCompanyChanged">
-                        <option value="">--Select Company--</option>
-                        @foreach (var company in Companies)
-                        {
-                            <option value="@company.Id">@company.Name</option>
-                        }
-                    </InputSelect>
-                    @if (ValidationErrors.ContainsKey(nameof(Visitor.VisitingCompanyId)))
-                    {
-                        <span class="text-danger">@ValidationErrors[nameof(Visitor.VisitingCompanyId)]</span>
-                    }
-                </div>
-                <div class="col-md-6">
-                    <label>Appointment With:</label>
-                    <InputSelect @bind-Value="Visitor.AppointmentWithId" class="form-control">
-                        <option value="">--Select Employee--</option>
-                        @if (AppointmentOptions.Any())
-                        {
-                            @foreach (var employee in AppointmentOptions)
-                            {
-                                <option value="@employee.Id">@employee.Name</option>
-                            }
-                        }
-                        else
-                        {
-                            <option disabled>No employees available</option>
-                        }
-                    </InputSelect>
-                    @if (ValidationErrors.ContainsKey(nameof(Visitor.AppointmentWithId)))
-                    {
-                        <span class="text-danger">@ValidationErrors[nameof(Visitor.AppointmentWithId)]</span>
-                    }
-                </div>
+            <!-- Company -->
+            <div class="mb-3">
+                <label>Company:</label>
+                <InputText @bind-Value="Visitor.Company" class="form-control" placeholder="Optional" />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Sign In</button>
+            <!-- Visiting Company -->
+            <div class="mb-3">
+                <label>Visiting Company:</label>
+                <InputSelect @bind-Value="Visitor.VisitingCompanyId" class="form-control" @oninput="OnVisitingCompanyChanged">
+                    <option value="">--Select Company--</option>
+                    @foreach (var company in Companies)
+                    {
+                        <option value="@company.Id">@company.Name</option>
+                    }
+                </InputSelect>
+                @if (ValidationErrors.ContainsKey(nameof(Visitor.VisitingCompanyId)))
+                {
+                    <span class="text-danger">@ValidationErrors[nameof(Visitor.VisitingCompanyId)]</span>
+                }
+            </div>
+
+            <!-- Appointment -->
+            <div class="mb-3">
+                <label>Appointment With:</label>
+                <InputSelect @bind-Value="Visitor.AppointmentWithId" class="form-control">
+                    <option value="">--Select Employee--</option>
+                    @if (AppointmentOptions.Any())
+                    {
+                        @foreach (var employee in AppointmentOptions)
+                        {
+                            <option value="@employee.Id">@employee.Name</option>
+                        }
+                    }
+                    else
+                    {
+                        <option disabled>No employees available</option>
+                    }
+                </InputSelect>
+                @if (ValidationErrors.ContainsKey(nameof(Visitor.AppointmentWithId)))
+                {
+                    <span class="text-danger">@ValidationErrors[nameof(Visitor.AppointmentWithId)]</span>
+                }
+            </div>
+
+            <!-- Submit -->
+            <button type="submit" class="btn btn-light w-100" style="color: #6f42c1; font-weight: bold;">Sign In</button>
 
             @if (SuccessMessage != null)
             {
@@ -95,7 +94,6 @@
                 <p class="text-danger text-center mt-3">@ErrorMessage</p>
             }
         </EditForm>
-
     </div>
 </div>
 
@@ -108,6 +106,11 @@
     private string? ErrorMessage;
     private SiginErrorApiResponse resposeError = new();
 
+    private void NavigateToHome()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
     protected override async Task OnInitializedAsync()
     {
         var response = await Http.GetAsync("api/companies");
@@ -115,22 +118,18 @@
         if (response.IsSuccessStatusCode)
         {
             string jsonResp = await response.Content.ReadAsStringAsync();
-
-            // Deserialize the JSON string into a CompanyResponse object using case-insensitive property matching
             var companyResp = JsonSerializer.Deserialize<CompanyResponse>(jsonResp, new JsonSerializerOptions
                 {
-                    // Ensures property names in the JSON are matched regardless of case
                     PropertyNameCaseInsensitive = true
                 });
 
-            // If companyResp is null, assign an empty list to Companies.
             Companies = companyResp?.Values ?? new List<CompanyDTO>();
         }
     }
 
     private async Task OnVisitingCompanyChanged(ChangeEventArgs e)
     {
-        AppointmentOptions.Clear(); // Reset the employee list on company change
+        AppointmentOptions.Clear();
 
         if (long.TryParse(e.Value?.ToString(), out var companyId) && companyId > 0)
         {
@@ -147,7 +146,7 @@
                 }
                 else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    AppointmentOptions = new List<EmployeeDTO>(); // No employees for the company
+                    AppointmentOptions = new List<EmployeeDTO>();
                 }
                 else
                 {
@@ -155,7 +154,7 @@
                     StateHasChanged();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ErrorMessage = "An error occurred while fetching employees.";
                 StateHasChanged();
@@ -163,7 +162,7 @@
         }
         else
         {
-            Visitor.VisitingCompanyId = 0; // Assign null when no valid company is selected
+            Visitor.VisitingCompanyId = 0;
         }
     }
 
@@ -173,7 +172,6 @@
 
         if (!result.IsValid)
         {
-            // Handle validation errors
             ValidationErrors.Clear();
             foreach (var error in result.Errors)
             {
@@ -184,27 +182,21 @@
         }
         else
         {
-            // Clear previous validation errors and messages
             ValidationErrors.Clear();
             ErrorMessage = null;
 
-            // Proceed with API call if validation succeeds
             var response = await Http.PostAsJsonAsync("api/signin", Visitor);
 
             if (response.IsSuccessStatusCode)
             {
-                // Success message and reset form
                 SuccessMessage = "Visitor signed in successfully.";
-                Visitor = new SignInVisitorDTO(); // Reset the form
-
-                // Force UI re-render and redirect after a short delay
+                Visitor = new SignInVisitorDTO();
                 StateHasChanged();
                 await Task.Delay(2000);
                 NavigationManager.NavigateTo("/");
             }
             else
             {
-                // Display the error message received from the API
                 resposeError = await response.Content.ReadFromJsonAsync<SiginErrorApiResponse>(new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
